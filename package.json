@@ -3,16 +3,28 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start -c",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
+    "@puremvc/puremvc-typescript-multicore-framework": "^2.2.0",
+    "@react-native-masked-view/masked-view": "0.3.2",
+    "@react-native-picker/picker": "^2.11.4",
+    "@react-navigation/native": "^7.2.2",
+    "@react-navigation/stack": "^7.8.9",
     "expo": "~54.0.33",
+    "expo-checkbox": "~5.0.8",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-native": "0.81.5",
+    "react-native-dropdown-picker": "^5.4.6",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-vector-icons": "^10.1.0"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",

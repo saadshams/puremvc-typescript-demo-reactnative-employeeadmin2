@@ -1,0 +1,67 @@
+//
+//  UserFormMediator.ts
+//  PureMVC TypeScript Demo - React Native EmployeeAdmin
+//
+//  Copyright(c) 2026 Saad Shams <saad.shams@puremvc.org>
+//  Your reuse is governed by the BSD 3-Clause License
+//
+
+import { Mediator } from "@puremvc/puremvc-typescript-multicore-framework";
+import { UserProxy } from "../model/UserProxy";
+import { IUserForm } from "./components/UserForm";
+import { User } from "../model/valueObject/User";
+
+export class UserFormMediator extends Mediator {
+
+  public static NAME = "UserFormMediator";
+
+  private userProxy!: UserProxy;
+
+  constructor(component: any) {
+    super(UserFormMediator.NAME, component);
+  }
+
+  public async onRegister() {
+    this.component.delegate = {
+      findUserById: id => this.findUserById(id),
+      save: user => this.save(user),
+      update: user => this.update(user)
+    };
+
+    this.userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
+    try {
+      this.component.setDepartments(await this.userProxy.findAllDepartments())
+    } catch(error) {
+      console.log(error);
+    }
+  }
+
+  private async findUserById(id: number) {
+    try {
+      this.component.setUser(await this.userProxy.findUserById(id));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  private async save(user: User) {
+    try {
+      this.component.goBack(await this.userProxy.save(user));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  private async update(user: User) {
+    try {
+      this.component.goBack(await this.userProxy.update(user));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  public get component() : IUserForm {
+    return this.viewComponent
+  }
+
+}
