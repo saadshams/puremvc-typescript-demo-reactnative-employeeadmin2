@@ -97,6 +97,7 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   // save handler
   const onSave = (event: any) => {
     user.id === 0 ? component.delegate.save(user) : component.delegate.update(user)
+    navigation.goBack();
   }
 
   // cancel handler

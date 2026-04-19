@@ -7,7 +7,6 @@
 //
 
 import { Proxy } from "@puremvc/puremvc-typescript-multicore-framework";
-import { ApplicationConstants } from "../ApplicationConstants";
 import { Role } from "./valueObject/Role";
 import {Platform} from "react-native";
 

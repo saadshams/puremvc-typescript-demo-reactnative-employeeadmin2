@@ -9,7 +9,6 @@
 import { Proxy } from "@puremvc/puremvc-typescript-multicore-framework";
 import { User } from "./valueObject/User";
 import { Department } from "./valueObject/Department";
-import { ApplicationConstants } from "../ApplicationConstants";
 import {Platform} from "react-native";
 
 export class UserProxy extends Proxy {

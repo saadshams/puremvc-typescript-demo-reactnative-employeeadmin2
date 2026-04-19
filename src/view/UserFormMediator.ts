@@ -46,7 +46,7 @@ export class UserFormMediator extends Mediator {
 
   private async save(user: User) {
     try {
-      this.component.goBack(await this.userProxy.save(user));
+      await this.userProxy.save(user);
     } catch (error) {
       console.log(error);
     }
@@ -54,7 +54,7 @@ export class UserFormMediator extends Mediator {
 
   private async update(user: User) {
     try {
-      this.component.goBack(await this.userProxy.update(user));
+      await this.userProxy.update(user);
     } catch (error) {
       console.log(error);
     }
