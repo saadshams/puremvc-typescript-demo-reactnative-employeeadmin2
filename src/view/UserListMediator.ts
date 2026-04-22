@@ -21,10 +21,8 @@ export class UserListMediator extends Mediator {
   }
 
   public async onRegister() {
-    this.component.delegate = {
-      findAllUsers: () => this.findAllUsers(),
-      deleteById: (id: number) => this.deleteById(id),
-    };
+    this.delegate.findAllUsers = () => this.findAllUsers();
+    this.delegate.deleteById = (id: number) => this.deleteById(id);
 
     this.userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
   }
@@ -37,7 +35,7 @@ export class UserListMediator extends Mediator {
     await this.userProxy.deleteById(id)
   }
 
-  public get component(): IUserList {
+  public get delegate(): IUserList {
     return this.viewComponent
   }
 

@@ -6,7 +6,7 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -23,12 +23,10 @@ interface Props {
 }
 
 export interface IUserForm {
-  delegate: {
-    findAllDepartments: () => Promise<Department[] | undefined>,
-    findUserById: (id: number) => Promise<User | undefined>,
-    save: (user: User) => Promise<void>,
-    update: (user: User) => Promise<void>,
-  };
+  findAllDepartments: () => Promise<Department[] | undefined>,
+  findUserById: (id: number) => Promise<User | undefined>,
+  save: (user: User) => Promise<void>,
+  update: (user: User) => Promise<void>,
 }
 
 const UserForm: React.FC<Props> = ( {navigation, route} ) => {
@@ -40,21 +38,22 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   const isAndroid = Platform.OS === "android";
   const isIOS = Platform.OS === "ios";
 
-  const component: IUserForm = useMemo(() => ({
-     delegate: {
-      findAllDepartments: async (): Promise<Department[]> => [],
-      findUserById: async (id: number): Promise<User | undefined> => undefined,
-      save: async (user: User): Promise<void> => {},
-      update: async (user: User): Promise<void> => {},
-    }
-  }), []);
+  const delegate = useRef<IUserForm>({
+    findAllDepartments: async (): Promise<Department[]> => [],
+    findUserById: async (id: number): Promise<User | undefined> => undefined,
+    save: async (user: User): Promise<void> => {},
+    update: async (user: User): Promise<void> => {},
+  });
 
   useEffect(() => {
-    ApplicationFacade.getInstance().register(component, ApplicationConstants.USER_FORM);
+    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_FORM);
 
     (async () => {
+      let result = await delegate.current.findAllDepartments();
+      if (result) setDepartments(result);
+
       if (route.params?.user.id) { // fetch user - if id is passed from UserList
-        const data = await component.delegate.findUserById(route.params?.user?.id)
+        let data = await delegate.current.findUserById(route.params?.user?.id)
         if (data) {
           data.confirm = data.password
           setUser(data)
@@ -63,9 +62,9 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
     })();
 
     return () => {
-      ApplicationFacade.getInstance().unregister(component, ApplicationConstants.USER_FORM)
+      ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_FORM)
     }
-  }, [component]);
+  }, [delegate]);
 
   // text fields handler
   const onChange = (field: keyof User, value: string) => {
@@ -89,7 +88,7 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
 
   // save handler
   const onSave = (event: any) => {
-    user.id === 0 ? component.delegate.save(user) : component.delegate.update(user)
+    user.id === 0 ? delegate.current.save(user) : delegate.current.update(user)
     navigation.goBack();
   }
 

@@ -22,12 +22,10 @@ export class UserFormMediator extends Mediator {
   }
 
   public async onRegister() {
-    this.component.delegate = {
-      findAllDepartments: () => this.findAllDepartments(),
-      findUserById: id => this.findUserById(id),
-      save: user => this.save(user),
-      update: user => this.update(user)
-    };
+    this.delegate.findAllDepartments = () => this.findAllDepartments();
+    this.delegate.findUserById = id => this.findUserById(id);
+    this.delegate.save = user => this.save(user);
+    this.delegate.update = user => this.update(user);
 
     this.userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
   }
@@ -64,7 +62,7 @@ export class UserFormMediator extends Mediator {
     }
   }
 
-  public get component() : IUserForm {
+  public get delegate() : IUserForm {
     return this.viewComponent
   }
 

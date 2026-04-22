@@ -29,11 +29,11 @@ export class ApplicationFacade extends Facade {
     this.sendNotification(ApplicationConstants.STARTUP);
   }
 
-  public register(component: any, type: string) {
-    this.sendNotification(ApplicationConstants.REGISTER, component, type);
+  public register(delegate: any, type: string) {
+    this.sendNotification(ApplicationConstants.REGISTER, delegate, type);
   }
 
-  public unregister(component: any, type: string) {
-    this.sendNotification(ApplicationConstants.UNREGISTER, component, type);
+  public unregister(delegate: any, type: string) {
+    this.sendNotification(ApplicationConstants.UNREGISTER, delegate, type);
   }
 }

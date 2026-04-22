@@ -6,7 +6,7 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {StackNavigationProp} from "@react-navigation/stack";
 import {RouteProp, useFocusEffect} from "@react-navigation/native";
@@ -20,38 +20,34 @@ interface Props {
 }
 
 export interface IUserList {
-  delegate: {
-    findAllUsers: () => Promise<Partial<User>[]>,
-    deleteById: (id: number) => Promise<void>,
-  };
+  findAllUsers: () => Promise<Partial<User>[]>,
+  deleteById: (id: number) => Promise<void>,
 }
 
 const UserList: React.FC<Props> = ({ navigation, route }) => {
 
   const [users, setUsers] = useState<Partial<User>[]>([]); // User Data
 
-  const component: IUserList = useMemo(() => ({
-    delegate: {
-      findAllUsers: async (): Promise<Partial<User>[]> => { return users },
-      deleteById: async (id: number): Promise<void> => {}
-    }
-  }), []);
+  const delegate = useRef<IUserList>({
+    findAllUsers: async () => [],
+    deleteById: async (_id: number) => {},
+  });
 
   useEffect(() => {
-    ApplicationFacade.getInstance().register(component, ApplicationConstants.USER_LIST)
+    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_LIST)
 
     return () => {
-      ApplicationFacade.getInstance().unregister(component, ApplicationConstants.USER_LIST)
+      ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_LIST)
     };
-  }, [component]);
+  }, []);
 
   useFocusEffect(
       useCallback(() => {
-        let isActive = true; // Flag to prevent updates if user navigates away
+        let isActive = true;
 
         (async () => {
           try {
-            const data = await component.delegate.findAllUsers();
+            const data = await delegate.current.findAllUsers();
             if (isActive) setUsers(data);
           } catch (error) {
             console.error("Failed to sync users:", error);
@@ -61,7 +57,7 @@ const UserList: React.FC<Props> = ({ navigation, route }) => {
         return () => {
           isActive = false;
         };
-      }, [component.delegate])
+      }, [delegate])
   );
 
   const onPress = (user: Partial<User>) => {

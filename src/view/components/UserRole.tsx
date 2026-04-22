@@ -6,7 +6,7 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { Button } from 'react-native';
@@ -22,10 +22,8 @@ interface Props {
 }
 
 export interface IUserRole {
-  delegate: {
-    findAllRoles: () => Promise<Role[] | undefined>,
-    findRolesByUserId: (id: number) => Promise<Role[] | undefined>
-  }
+  findAllRoles: () => Promise<Role[] | undefined>,
+  findRolesByUserId: (id: number) => Promise<Role[] | undefined>
 }
 
 const UserRole: React.FC<Props> = ({ navigation, route }) => {
@@ -33,27 +31,25 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
   const [roles, setRoles] = useState<Role[]>([]); // UI Data
   const [data, setData] = useState<Role[]>([]); // User Data
 
-  const component: IUserRole = useMemo(() => ({
-    delegate: {
-      findAllRoles: async (): Promise<Role[]> => { return roles },
-      findRolesByUserId: async (id: number): Promise<Role[]> => { return data },
-    }
-  }), []);
+  const delegate = useRef<IUserRole>({
+    findAllRoles: async (): Promise<Role[]> => { return roles },
+    findRolesByUserId: async (id: number): Promise<Role[]> => { return data },
+  });
 
   useEffect(() => {
-    ApplicationFacade.getInstance().register(component, ApplicationConstants.USER_ROLE);
+    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_ROLE);
 
     (async () => {
-      let result = await component.delegate.findAllRoles();
+      let result = await delegate.current.findAllRoles();
       if (result) setRoles(result);
-      result = await component.delegate.findRolesByUserId(route.params?.user.id);
+      result = await delegate.current.findRolesByUserId(route.params?.user.id);
       if (result) setData(result);
     })();
 
     return () => {
-      ApplicationFacade.getInstance().unregister(component, ApplicationConstants.USER_ROLE)
+      ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_ROLE)
     };
-  }, [component]);
+  }, [delegate]);
 
   const onChange = (role: Role) => {
     setData((state) => {
