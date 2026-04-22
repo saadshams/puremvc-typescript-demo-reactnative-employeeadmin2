@@ -16,8 +16,8 @@ export class UserRoleMediator extends Mediator {
 
   private roleProxy!: RoleProxy;
 
-  constructor(component: any) {
-    super(UserRoleMediator.NAME, component);
+  constructor(delegate: any) {
+    super(UserRoleMediator.NAME, delegate);
   }
 
   public async onRegister() {

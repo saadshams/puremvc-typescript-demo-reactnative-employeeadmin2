@@ -16,8 +16,8 @@ export class UserListMediator extends Mediator {
 
   private userProxy!: UserProxy;
 
-  constructor(component: any) {
-    super(UserListMediator.NAME, component);
+  constructor(delegate: any) {
+    super(UserListMediator.NAME, delegate);
   }
 
   public async onRegister() {

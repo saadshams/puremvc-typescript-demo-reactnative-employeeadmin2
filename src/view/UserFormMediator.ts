@@ -17,8 +17,8 @@ export class UserFormMediator extends Mediator {
 
   private userProxy!: UserProxy;
 
-  constructor(component: any) {
-    super(UserFormMediator.NAME, component);
+  constructor(delegate: any) {
+    super(UserFormMediator.NAME, delegate);
   }
 
   public async onRegister() {
