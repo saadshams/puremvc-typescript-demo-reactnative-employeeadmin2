@@ -22,20 +22,24 @@ export class UserRoleMediator extends Mediator {
 
   public async onRegister() {
     this.component.delegate = {
-      fetchRoles: id => this.fetchRoles(id)
+      findAllRoles: () => this.findAllRoles(),
+      findRolesByUserId: id => this.findRolesByUserId(id)
     };
 
     this.roleProxy = this.facade.retrieveProxy(RoleProxy.NAME) as RoleProxy;
+  }
+
+  private async findAllRoles() {
     try {
-      this.component.setRoles(await this.roleProxy.findAllRoles());
+      return await this.roleProxy.findAllRoles();
     } catch(error) {
       console.log(error);
     }
   }
 
-  private async fetchRoles(id: number) {
+  private async findRolesByUserId(id: number) {
     try {
-      this.component.setData(await this.roleProxy.findRolesById(id));
+      return await this.roleProxy.findRolesById(id);
     } catch(error) {
       console.log(error);
     }

@@ -22,35 +22,32 @@ interface Props {
 }
 
 export interface IUserRole {
-  USER_ROLE_FETCH: string;
-  setRoles: (roles: Role[]) => void;
-  setData: (data: Role[]) => void;
-
   delegate: {
-    fetchRoles: (id: number) => Promise<void>
+    findAllRoles: () => Promise<Role[] | undefined>,
+    findRolesByUserId: (id: number) => Promise<Role[] | undefined>
   }
 }
 
 const UserRole: React.FC<Props> = ({ navigation, route }) => {
 
-  const [roles, setRoles] = useState<Role[]>(); // UI Data
+  const [roles, setRoles] = useState<Role[]>([]); // UI Data
   const [data, setData] = useState<Role[]>([]); // User Data
 
   const component: IUserRole = useMemo(() => ({
-    USER_ROLE_FETCH: "UserRoleFetch",
-    setRoles: setRoles,
-    setData: setData,
-
     delegate: {
-      fetchRoles: async (id: number): Promise<void> => {},
+      findAllRoles: async (): Promise<Role[]> => { return roles },
+      findRolesByUserId: async (id: number): Promise<Role[]> => { return data },
     }
-  }), [setRoles, setData]);
+  }), []);
 
   useEffect(() => {
     ApplicationFacade.getInstance().register(component, ApplicationConstants.USER_ROLE);
 
     (async () => {
-      await component.delegate.fetchRoles(route.params?.user.id)
+      let result = await component.delegate.findAllRoles();
+      if (result) setRoles(result);
+      result = await component.delegate.findRolesByUserId(route.params?.user.id);
+      if (result) setData(result);
     })();
 
     return () => {

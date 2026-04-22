@@ -19,14 +19,11 @@ import UserList from "./view/components/UserList";
 import UserForm from "./view/components/UserForm";
 import UserRole from "./view/components/UserRole";
 
+ApplicationFacade.getInstance().startup();
+
+const Stack = createStackNavigator<ParamList>();
+
 const Application: React.FC = () => {
-
-  useEffect(() => {
-    ApplicationFacade.getInstance().startup();
-  }, []);
-
-  const Stack = createStackNavigator<ParamList>();
-
   return (
       <NavigationContainer>
           <Stack.Navigator initialRouteName="UserList">

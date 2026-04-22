@@ -22,7 +22,7 @@ export class ApplicationConstants {
 }
 
 export type ParamList = {
-  UserList: {user: User};
-  UserForm: {user: Partial<User>};
-  UserRole: {user: User };
+  UserList: {};
+  UserForm: { user: Partial<User> };
+  UserRole: { user: User };
 };

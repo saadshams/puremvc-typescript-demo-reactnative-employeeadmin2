@@ -21,12 +21,20 @@ export class UserListMediator extends Mediator {
   }
 
   public async onRegister() {
+    this.component.delegate = {
+      findAllUsers: () => this.findAllUsers(),
+      deleteById: (id: number) => this.deleteById(id),
+    };
+
     this.userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
-    try {
-      this.component.setUsers(await this.userProxy.findAllUsers());
-    } catch(error) {
-      console.log(error);
-    }
+  }
+
+  private async findAllUsers() {
+    return await this.userProxy.findAllUsers();
+  }
+
+  private async deleteById(id: number): Promise<void> {
+    await this.userProxy.deleteById(id)
   }
 
   public get component(): IUserList {

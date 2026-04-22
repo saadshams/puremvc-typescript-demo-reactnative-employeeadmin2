@@ -28,7 +28,7 @@ export class RoleProxy extends Proxy {
    }
   }
 
-  public async findRolesById(id: number) {
+  public async findRolesById(id: number): Promise<Role[]> {
     const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users/${id}/roles`);
     if (response.status === 200) {
       return await response.json();

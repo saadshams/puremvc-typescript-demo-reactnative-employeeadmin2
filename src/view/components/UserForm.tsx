@@ -23,12 +23,9 @@ interface Props {
 }
 
 export interface IUserForm {
-  setUser: (user: User) => void,
-  setDepartments: (departments: Department[]) => void,
-  goBack: (u: User) => void,
-
   delegate: {
-    findUserById: (id: number) => Promise<void>,
+    findAllDepartments: () => Promise<Department[] | undefined>,
+    findUserById: (id: number) => Promise<User | undefined>,
     save: (user: User) => Promise<void>,
     update: (user: User) => Promise<void>,
   };
@@ -44,28 +41,24 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   const isIOS = Platform.OS === "ios";
 
   const component: IUserForm = useMemo(() => ({
-    setUser: (user: User) => {
-      user.confirm = user.password;
-      setUser(user)
-    },
-    setDepartments: setDepartments,
-    goBack: (u: User) => {
-      navigation.navigate("UserList", { user: u })
-    },
-
-    delegate: {
-      findUserById: async (id: number): Promise<void> => { },
-      save: async (user: User): Promise<void> => { },
-      update: async (user: User): Promise<void> => { },
+     delegate: {
+      findAllDepartments: async (): Promise<Department[]> => [],
+      findUserById: async (id: number): Promise<User | undefined> => undefined,
+      save: async (user: User): Promise<void> => {},
+      update: async (user: User): Promise<void> => {},
     }
-  }), [setUser, setDepartments]);
+  }), []);
 
-  useEffect(() => { // mount
+  useEffect(() => {
     ApplicationFacade.getInstance().register(component, ApplicationConstants.USER_FORM);
 
     (async () => {
       if (route.params?.user.id) { // fetch user - if id is passed from UserList
-        await component.delegate.findUserById(route.params?.user?.id)
+        const data = await component.delegate.findUserById(route.params?.user?.id)
+        if (data) {
+          data.confirm = data.password
+          setUser(data)
+        }
       }
     })();
 

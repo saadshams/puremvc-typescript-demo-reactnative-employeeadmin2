@@ -23,22 +23,26 @@ export class UserFormMediator extends Mediator {
 
   public async onRegister() {
     this.component.delegate = {
+      findAllDepartments: () => this.findAllDepartments(),
       findUserById: id => this.findUserById(id),
       save: user => this.save(user),
       update: user => this.update(user)
     };
 
     this.userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
+  }
+
+  private async findAllDepartments() {
     try {
-      this.component.setDepartments(await this.userProxy.findAllDepartments())
-    } catch(error) {
+      return await this.userProxy.findAllDepartments();
+    } catch (error) {
       console.log(error);
     }
   }
 
   private async findUserById(id: number) {
     try {
-      this.component.setUser(await this.userProxy.findUserById(id));
+     return await this.userProxy.findUserById(id);
     } catch (error) {
       console.log(error);
     }
