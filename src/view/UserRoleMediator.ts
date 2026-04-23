@@ -28,19 +28,11 @@ export class UserRoleMediator extends Mediator {
   }
 
   private async findAllRoles() {
-    try {
-      return await this.roleProxy.findAllRoles();
-    } catch(error) {
-      console.log(error);
-    }
+    return await this.roleProxy.findAllRoles();
   }
 
   private async findRolesByUserId(id: number) {
-    try {
-      return await this.roleProxy.findRolesById(id);
-    } catch(error) {
-      console.log(error);
-    }
+    return await this.roleProxy.findRolesById(id);
   }
 
   public get delegate() : IUserRole {

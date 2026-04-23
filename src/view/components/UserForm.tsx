@@ -23,8 +23,8 @@ interface Props {
 }
 
 export interface IUserForm {
-  findAllDepartments: () => Promise<Department[] | undefined>,
-  findUserById: (id: number) => Promise<User | undefined>,
+  findAllDepartments: () => Promise<Department[]>,
+  findUserById: (id: number) => Promise<User>,
   save: (user: User) => Promise<void>,
   update: (user: User) => Promise<void>,
 }
@@ -40,7 +40,7 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
 
   const delegate = useRef<IUserForm>({
     findAllDepartments: async (): Promise<Department[]> => [],
-    findUserById: async (id: number): Promise<User | undefined> => undefined,
+    findUserById: async (id: number): Promise<User> => user,
     save: async (user: User): Promise<void> => {},
     update: async (user: User): Promise<void> => {},
   });
@@ -49,14 +49,18 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
     ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_FORM);
 
     (async () => {
-      let result = await delegate.current.findAllDepartments();
-      if (result) setDepartments(result);
+      try {
+        setDepartments(await delegate.current.findAllDepartments());
+      } catch (error) {
+        console.error("Failed to load departments:", error);
+      }
 
       if (route.params?.user.id) { // fetch user - if id is passed from UserList
-        let data = await delegate.current.findUserById(route.params?.user?.id)
-        if (data) {
-          data.confirm = data.password
-          setUser(data)
+        try {
+          let data = await delegate.current.findUserById(route.params?.user?.id)
+          setUser({...data, confirm: data.password});
+        } catch (error) {
+          console.error("Failed to load user:", error);
         }
       }
     })();

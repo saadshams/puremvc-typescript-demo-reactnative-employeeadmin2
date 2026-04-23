@@ -32,7 +32,7 @@ export class UserListMediator extends Mediator {
   }
 
   private async deleteById(id: number): Promise<void> {
-    await this.userProxy.deleteById(id)
+    await this.userProxy.deleteById(id);
   }
 
   public get delegate(): IUserList {

@@ -31,35 +31,19 @@ export class UserFormMediator extends Mediator {
   }
 
   private async findAllDepartments() {
-    try {
-      return await this.userProxy.findAllDepartments();
-    } catch (error) {
-      console.log(error);
-    }
+    return await this.userProxy.findAllDepartments();
   }
 
   private async findUserById(id: number) {
-    try {
-     return await this.userProxy.findUserById(id);
-    } catch (error) {
-      console.log(error);
-    }
+    return await this.userProxy.findUserById(id);
   }
 
   private async save(user: User) {
-    try {
-      await this.userProxy.save(user);
-    } catch (error) {
-      console.log(error);
-    }
+    await this.userProxy.save(user);
   }
 
   private async update(user: User) {
-    try {
-      await this.userProxy.update(user);
-    } catch (error) {
-      console.log(error);
-    }
+    await this.userProxy.update(user);
   }
 
   public get delegate() : IUserForm {

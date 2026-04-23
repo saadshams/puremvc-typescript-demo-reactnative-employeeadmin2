@@ -22,8 +22,8 @@ interface Props {
 }
 
 export interface IUserRole {
-  findAllRoles: () => Promise<Role[] | undefined>,
-  findRolesByUserId: (id: number) => Promise<Role[] | undefined>
+  findAllRoles: () => Promise<Role[]>,
+  findRolesByUserId: (id: number) => Promise<Role[]>
 }
 
 const UserRole: React.FC<Props> = ({ navigation, route }) => {
@@ -40,10 +40,8 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
     ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_ROLE);
 
     (async () => {
-      let result = await delegate.current.findAllRoles();
-      if (result) setRoles(result);
-      result = await delegate.current.findRolesByUserId(route.params?.user.id);
-      if (result) setData(result);
+      setRoles(await delegate.current.findAllRoles());
+      setData(await delegate.current.findRolesByUserId(route.params?.user.id));
     })();
 
     return () => {
