@@ -32,8 +32,8 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
   const [data, setData] = useState<Role[]>([]); // User Data
 
   const delegate = useRef<IUserRole>({
-    findAllRoles: async (): Promise<Role[]> => { return roles },
-    findRolesByUserId: async (id: number): Promise<Role[]> => { return data },
+    findAllRoles: async (): Promise<Role[]> => [],
+    findRolesByUserId: async (id: number): Promise<Role[]> => [],
   });
 
   useEffect(() => {
@@ -41,7 +41,8 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
 
     (async () => {
       setRoles(await delegate.current.findAllRoles());
-      setData(await delegate.current.findRolesByUserId(route.params?.user.id));
+      if (!route.params?.user.id) return;
+      setData(await delegate.current.findRolesByUserId(route.params.user.id));
     })();
 
     return () => {

@@ -40,7 +40,7 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
 
   const delegate = useRef<IUserForm>({
     findAllDepartments: async (): Promise<Department[]> => [],
-    findUserById: async (id: number): Promise<User> => user,
+    findUserById: async (id: number): Promise<User> => createDefaultUser(),
     save: async (user: User): Promise<void> => {},
     update: async (user: User): Promise<void> => {},
   });
@@ -55,13 +55,12 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
         console.error("Failed to load departments:", error);
       }
 
-      if (route.params?.user.id) { // fetch user - if id is passed from UserList
-        try {
-          let data = await delegate.current.findUserById(route.params?.user?.id)
-          setUser({...data, confirm: data.password});
-        } catch (error) {
-          console.error("Failed to load user:", error);
-        }
+      if (!route.params?.user.id) return;
+      try {
+        let data = await delegate.current.findUserById(route.params.user.id) // if id is passed from UserList
+        setUser({...data, confirm: data.password});
+      } catch (error) {
+        console.error("Failed to load user:", error);
       }
     })();
 
@@ -80,7 +79,7 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   // department handler
   const onValueChange = (value: number, index: number) => {
     setUser((state: User) => (
-      { ...state, department: value === 0 ? DEFAULT_DEPARTMENT : departments.find(d => d.id === value)} as User
+      { ...state, department: value === 0 ? DEFAULT_DEPARTMENT : departments.find(department => department.id === value)} as User
     ));
     setTimeout(() => setIsPickerVisible(false), 150);
   }
