@@ -44,7 +44,6 @@ const UserList: React.FC<Props> = ({ navigation, route }) => {
   useFocusEffect(
       useCallback(() => {
         let isActive = true;
-
         void (async () => {
           try {
             const data = await delegate.current.findAllUsers();

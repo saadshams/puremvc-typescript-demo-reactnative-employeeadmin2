@@ -33,7 +33,7 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
 
   const delegate = useRef<IUserRole>({
     findAllRoles: async (): Promise<Role[]> => [],
-    findRolesByUserId: async (id: number): Promise<Role[]> => [],
+    findRolesByUserId: async (_id: number): Promise<Role[]> => [],
   });
 
   useEffect(() => {

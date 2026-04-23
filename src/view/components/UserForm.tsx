@@ -40,9 +40,9 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
 
   const delegate = useRef<IUserForm>({
     findAllDepartments: async (): Promise<Department[]> => [],
-    findUserById: async (id: number): Promise<User> => createDefaultUser(),
-    save: async (user: User): Promise<void> => {},
-    update: async (user: User): Promise<void> => {},
+    findUserById: async (_id: number): Promise<User> => createDefaultUser(),
+    save: async (_user: User): Promise<void> => {},
+    update: async (_user: User): Promise<void> => {},
   });
 
   useEffect(() => {
