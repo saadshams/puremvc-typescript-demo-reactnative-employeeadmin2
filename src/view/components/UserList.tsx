@@ -45,7 +45,7 @@ const UserList: React.FC<Props> = ({ navigation, route }) => {
       useCallback(() => {
         let isActive = true;
 
-        (async () => {
+        void (async () => {
           try {
             const data = await delegate.current.findAllUsers();
             if (isActive) setUsers(data);
@@ -57,7 +57,7 @@ const UserList: React.FC<Props> = ({ navigation, route }) => {
         return () => {
           isActive = false;
         };
-      }, [delegate])
+      }, [])
   );
 
   const onPress = (user: Partial<User>) => {

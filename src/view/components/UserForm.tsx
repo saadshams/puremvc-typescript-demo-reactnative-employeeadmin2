@@ -64,7 +64,7 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
     return () => {
       ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_FORM)
     }
-  }, [delegate]);
+  }, []);
 
   // text fields handler
   const onChange = (field: keyof User, value: string) => {

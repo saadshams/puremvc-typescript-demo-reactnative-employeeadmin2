@@ -49,7 +49,7 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
     return () => {
       ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_ROLE)
     };
-  }, [delegate]);
+  }, []);
 
   const onChange = (role: Role) => {
     setData((state) => {
