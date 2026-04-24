@@ -43,21 +43,21 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
     findUserById: async (_id: number): Promise<User> => createDefaultUser(),
     save: async (_user: User): Promise<void> => {},
     update: async (_user: User): Promise<void> => {},
-  });
+  }).current;
 
   useEffect(() => {
-    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_FORM);
+    ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_FORM);
 
     (async () => {
       try {
-        setDepartments(await delegate.current.findAllDepartments());
+        setDepartments(await delegate.findAllDepartments());
       } catch (error) {
         console.error("Failed to load departments:", error);
       }
 
-      if (!route.params?.user.id) return;
+      if (!route.params?.user.id) return; // if id is passed from UserList``
       try {
-        let data = await delegate.current.findUserById(route.params.user.id) // if id is passed from UserList
+        let data = await delegate.findUserById(route.params.user.id)
         setUser({...data, confirm: data.password});
       } catch (error) {
         console.error("Failed to load user:", error);
@@ -90,9 +90,13 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   }
 
   // save handler
-  const onSave = (event: any) => {
-    user.id === 0 ? delegate.current.save(user) : delegate.current.update(user)
-    navigation.goBack();
+  const onSave = async (event: any) => {
+    try {
+      user.id === 0 ? await delegate.save(user) : await delegate.update(user);
+      navigation.goBack();
+    } catch (error) {
+      console.error("Failed to save user:", error);
+    }
   }
 
   // cancel handler
@@ -103,51 +107,95 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.row}>
-        <TextInput style={styles.input} placeholder="First Name" value={user?.first} onChangeText={(value) => onChange("first", value)} />
-        <TextInput style={styles.input} placeholder="Last Name" value={user?.last} onChangeText={(value) => onChange("last", value)} />
+        <>{first()}{last()}</>
       </View>
       <View style={styles.row}>
-        <TextInput style={styles.input} placeholder="Email" value={user?.email} onChangeText={(value) => onChange("email", value)} keyboardType="email-address" />
-        <TextInput style={styles.input} placeholder="Username" value={user?.username} onChangeText={(value) => onChange("username", value)} />
+        <>{email()}{username()}</>
       </View>
       <View style={styles.row}>
-        <TextInput style={styles.input} placeholder="Password" value={user?.password} onChangeText={(value) => setUser( ({...user, password: value } as User) )} />
-        <TextInput style={styles.input} placeholder="Confirm" value={user?.confirm} onChangeText={(value) => setUser( ({...user, confirm: value } as User) )} />
+        <>{password()}{confirm()}</>
       </View>
       <View style={styles.row}>
-        <View style={isAndroid ? styles.androidContainer : styles.iosContainer}>
-          {isIOS && (
-              <TouchableOpacity style={styles.iosTrigger} onPress={() => setIsPickerVisible((flag) => !flag)}>
-                <Text style={styles.iosDisplayText}>
-                  {departments.find((department) => department.id === user.department.id)?.name ?? DEFAULT_DEPARTMENT.name }
-                </Text>
-                <MaterialIcons name={isPickerVisible ? "arrow-drop-up" : "arrow-drop-down"} size={24} color="#666" style={styles.arrow} />
-              </TouchableOpacity>
-          )}
-
-          {(isAndroid || (isIOS && isPickerVisible)) && (
-              <Picker itemStyle={{fontSize: 16}}  selectedValue={user.department.id} onValueChange={onValueChange} style={isAndroid ? undefined : styles.iosPicker} mode={isAndroid ? "dropdown" : undefined}>
-                <Picker.Item label={DEFAULT_DEPARTMENT.name} value={0} />
-                {departments.map((department) => (
-                    <Picker.Item key={department.id.toString()} label={department.name} value={department.id} />
-                ))}
-              </Picker>
-          )}
-        </View>
-        <TouchableOpacity style={[styles.button, styles.roles]} onPress={onRoles}>
-          <Text style={styles.buttonText}>ROLES</Text>
-        </TouchableOpacity>
+        <>{department()}{roles()}</>
       </View>
       <View style={styles.row}>
-        <TouchableOpacity style={[styles.button, styles.cancel]} onPress={onCancel}>
-          <Text style={styles.buttonText}>CANCEL</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.save]} onPress={onSave}>
-          <Text style={styles.buttonText}>{route.params?.user.id ? "UPDATE" : "SAVE"}</Text>
-        </TouchableOpacity>
+        <>{cancel()}{save()}</>
       </View>
     </ScrollView>
   );
+
+  function first() {
+    return (<TextInput style={styles.input} placeholder="First Name" value={user?.first} onChangeText={(value) => onChange("first", value)} />);
+  }
+
+  function last() {
+    return (<TextInput style={styles.input} placeholder="Last Name" value={user?.last} onChangeText={(value) => onChange("last", value)} />);
+  }
+
+  function email() {
+    return (<TextInput style={styles.input} placeholder="Email" value={user?.email} onChangeText={(value) => onChange("email", value)} keyboardType="email-address" />);
+  }
+
+  function username() {
+    return (<TextInput style={styles.input} placeholder="Username" value={user?.username} onChangeText={(value) => onChange("username", value)} />);
+  }
+
+  function password() {
+    return (<TextInput style={styles.input} placeholder="Password" value={user?.password} onChangeText={(value) => setUser( ({...user, password: value } as User) )} />);
+  }
+
+  function confirm() {
+    return (<TextInput style={styles.input} placeholder="Confirm" value={user?.confirm} onChangeText={(value) => setUser( ({...user, confirm: value } as User) )} />);
+  }
+
+  function department() {
+    return (
+      <View style={isAndroid ? styles.androidContainer : styles.iosContainer}>
+        {isIOS && (
+          <TouchableOpacity style={styles.iosTrigger} onPress={() => setIsPickerVisible((flag) => !flag)}>
+            <Text style={styles.iosDisplayText}>
+              {departments.find((department) => department.id === user.department.id)?.name ?? DEFAULT_DEPARTMENT.name }
+            </Text>
+            <MaterialIcons name={isPickerVisible ? "arrow-drop-up" : "arrow-drop-down"} size={24} color="#666" style={styles.arrow} />
+          </TouchableOpacity>
+        )}
+
+        {(isAndroid || (isIOS && isPickerVisible)) && (
+          <Picker itemStyle={{fontSize: 16}}  selectedValue={user.department.id} onValueChange={onValueChange} style={isAndroid ? undefined : styles.iosPicker} mode={isAndroid ? "dropdown" : undefined}>
+            <Picker.Item label={DEFAULT_DEPARTMENT.name} value={0} />
+            {departments.map((department) => (
+              <Picker.Item key={department.id.toString()} label={department.name} value={department.id} />
+            ))}
+          </Picker>
+        )}
+      </View>
+    );
+  }
+
+  function roles() {
+    return (
+      <TouchableOpacity style={[styles.button, styles.roles]} onPress={onRoles}>
+        <Text style={styles.buttonText}>ROLES</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  function cancel() {
+    return (
+      <TouchableOpacity style={[styles.button, styles.cancel]} onPress={onCancel}>
+        <Text style={styles.buttonText}>CANCEL</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  function save() {
+    return (
+      <TouchableOpacity style={[styles.button, styles.save]} onPress={onSave}>
+        <Text style={styles.buttonText}>{route.params?.user.id ? "UPDATE" : "SAVE"}</Text>
+      </TouchableOpacity>
+    );
+  }
+
 }
 
 const styles = StyleSheet.create({

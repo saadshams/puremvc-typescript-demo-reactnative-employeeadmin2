@@ -34,15 +34,20 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
   const delegate = useRef<IUserRole>({
     findAllRoles: async (): Promise<Role[]> => [],
     findRolesByUserId: async (_id: number): Promise<Role[]> => [],
-  });
+  }).current;
 
   useEffect(() => {
-    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_ROLE);
+    ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_ROLE);
 
     (async () => {
-      setRoles(await delegate.current.findAllRoles());
-      if (!route.params?.user.id) return;
-      setData(await delegate.current.findRolesByUserId(route.params.user.id));
+      setRoles(await delegate.findAllRoles());
+      if (route.params?.user.roles.length > 0) {
+        setData(route.params.user.roles);
+        return;
+      }
+      if (route.params?.user.id) {
+        setData(await delegate.findRolesByUserId(route.params.user.id));
+      }
     })();
 
     return () => {
@@ -72,6 +77,18 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
   return(
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
+        {list()}
+      </ScrollView>
+      <View style={styles.sticky}>
+        {cancel()}
+        {save()}
+      </View>
+    </View>
+  );
+
+  function list() {
+    return (
+      <>
         {roles?.map((role: Role) => (
           <View key={`role_${role.id}`} style={styles.item}>
             <Checkbox value={data.some(r => r.id === role.id)} onValueChange={() => onChange(role)} />
@@ -81,13 +98,17 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
             {/*          iconType="material-community" checkedIcon="checkbox-outline" uncheckedIcon={"checkbox-blank-outline"} />*/}
           </View>
         ))}
-      </ScrollView>
-      <View style={styles.sticky}>
-        <Button title="Cancel" onPress={onCancel} />
-        <Button title="Save" onPress={onSave} />
-      </View>
-    </View>
-  );
+      </>
+    );
+  }
+
+  function cancel() {
+    return (<Button title="Cancel" onPress={onCancel} />);
+  }
+
+  function save() {
+    return (<Button title="Save" onPress={onSave} />);
+  }
 }
 
 const styles = StyleSheet.create({

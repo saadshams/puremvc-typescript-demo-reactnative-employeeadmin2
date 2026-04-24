@@ -7,7 +7,7 @@
 //
 
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Animated, FlatList, PanResponder, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {StackNavigationProp} from "@react-navigation/stack";
 import {RouteProp, useFocusEffect} from "@react-navigation/native";
 import {ApplicationConstants, ParamList} from "../../ApplicationConstants";
@@ -24,17 +24,17 @@ export interface IUserList {
   deleteById: (id: number) => Promise<void>,
 }
 
-const UserList: React.FC<Props> = ({ navigation, route }) => {
+const UserList: React.FC<Props> = ({navigation, route}) => {
 
   const [users, setUsers] = useState<Partial<User>[]>([]); // User Data
 
   const delegate = useRef<IUserList>({
     findAllUsers: async () => [],
     deleteById: async (_id: number) => {},
-  });
+  }).current;
 
   useEffect(() => {
-    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_LIST)
+    ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_LIST)
 
     return () => {
       ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_LIST)
@@ -42,52 +42,123 @@ const UserList: React.FC<Props> = ({ navigation, route }) => {
   }, []);
 
   useFocusEffect(
-      useCallback(() => {
-        let isActive = true;
-        void (async () => {
-          try {
-            const data = await delegate.current.findAllUsers();
-            if (isActive) setUsers(data);
-          } catch (error) {
-            console.error("Failed to sync users:", error);
-          }
-        })();
+    useCallback(() => {
+      let isActive = true;
+      void (async () => {
+        try {
+          const data = await delegate.findAllUsers();
+          if (isActive) setUsers(data);
+        } catch (error) {
+          console.error("Failed to sync users:", error);
+        }
+      })();
 
-        return () => {
-          isActive = false;
-        };
-      }, [])
+      return () => {
+        isActive = false;
+      };
+    }, [])
   );
 
   const onPress = (user: Partial<User>) => {
-    navigation.navigate("UserForm", { user: user });
+    navigation.navigate("UserForm", {user: user});
   };
 
   return (
-      <View style={styles.container}>
-        <FlatList<Partial<User>> data={users}
-          ListEmptyComponent={<Text>No Users Found</Text>}
-          keyExtractor={(user: Partial<User>) => `user_${user.id}`}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => onPress(item)}>
-              <Text style={styles.user}>{item.last}, {item.first}</Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+    <View style={styles.container}>
+      <FlatList<Partial<User>>
+        data={users}
+        ListEmptyComponent={<Text>No Users Found</Text>}
+        keyExtractor={(user) => `user_${user.id}`}
+        renderItem={({ item }) => <ListItem item={item} />}
+      />
+    </View>
   );
+
+  function ListItem({ item }: { item: Partial<User> }) {
+    const translateX = useRef(new Animated.Value(0)).current;
+
+    const responder = useRef(
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gesture) => {
+          return Math.abs(gesture.dx) > 10 && Math.abs(gesture.dx) > Math.abs(gesture.dy);
+        },
+
+        onPanResponderMove: (_, gesture) => {
+          if (gesture.dx < 0) {
+            translateX.setValue(Math.max(gesture.dx, -100));
+          }
+        },
+
+        onPanResponderRelease: (_, gesture) => {
+          Animated.spring(translateX, {toValue: gesture.dx < -50 ? -100 : 0, useNativeDriver: true,}).start();
+        },
+      })
+    ).current;
+
+    const onDelete = async () => {
+      if (!item.id) return;
+      try {
+        await delegate.deleteById(item.id);
+        setUsers((prev) => prev.filter((user) => user.id !== item.id));
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+      }
+    };
+
+    return (
+      <View style={styles.swipeRow}>
+        <TouchableOpacity style={styles.deleteAction} onPress={onDelete}>
+          <Text style={styles.deleteText}>Delete</Text>
+        </TouchableOpacity>
+
+        <Animated.View style={[styles.rowContent, { transform: [{ translateX }] }]} {...responder.panHandlers}>
+          <TouchableOpacity onPress={() => onPress(item)}>
+            <Text style={styles.listItem}>{item.last}, {item.first}</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+    );
+  };
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  user: {
+  listItemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  listItem: {
     padding: 16,
     fontSize: 16,
     fontWeight: "bold",
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+  },
+  swipeRow: {
+    position: "relative",
+    overflow: "hidden",
+  },
+  deleteAction: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "red",
+  },
+
+  deleteText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+
+  rowContent: {
+    backgroundColor: "white",
   },
 });
 
