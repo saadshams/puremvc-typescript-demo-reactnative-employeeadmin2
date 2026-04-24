@@ -6,10 +6,10 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import { Mediator } from "@puremvc/puremvc-typescript-multicore-framework";
-import { UserProxy } from "../model/UserProxy";
-import { IUserForm } from "./components/UserForm";
-import { User } from "../model/valueObject/User";
+import {Mediator} from "@puremvc/puremvc-typescript-multicore-framework";
+import {UserProxy} from "../model/UserProxy";
+import {IUserForm} from "./components/UserForm";
+import {User} from "../model/valueObject/User";
 
 export class UserFormMediator extends Mediator {
 
@@ -46,7 +46,7 @@ export class UserFormMediator extends Mediator {
     await this.userProxy.update(user);
   }
 
-  public get delegate() : IUserForm {
+  public get delegate(): IUserForm {
     return this.viewComponent
   }
 

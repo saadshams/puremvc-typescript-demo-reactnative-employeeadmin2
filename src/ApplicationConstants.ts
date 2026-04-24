@@ -6,7 +6,7 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import { User } from "./model/valueObject/User";
+import {User} from "./model/valueObject/User";
 
 export class ApplicationConstants {
   public static KEY: string = "employeeAdmin";
@@ -21,7 +21,7 @@ export class ApplicationConstants {
 }
 
 export type ParamList = {
-  UserList: { };
+  UserList: {};
   UserForm: { user: Partial<User> };
   UserRole: { user: User };
 };

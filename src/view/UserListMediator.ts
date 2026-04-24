@@ -6,9 +6,9 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import { Mediator } from "@puremvc/puremvc-typescript-multicore-framework";
-import { UserProxy } from "../model/UserProxy";
-import { IUserList } from "./components/UserList";
+import {Mediator} from "@puremvc/puremvc-typescript-multicore-framework";
+import {UserProxy} from "../model/UserProxy";
+import {IUserList} from "./components/UserList";
 
 export class UserListMediator extends Mediator {
 

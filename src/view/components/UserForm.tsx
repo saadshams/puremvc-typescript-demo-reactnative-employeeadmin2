@@ -7,15 +7,15 @@
 //
 
 import React, {useEffect, useRef, useState} from "react";
-import { Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { RouteProp } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { Picker } from "@react-native-picker/picker";
-import { ApplicationConstants, ParamList } from "../../ApplicationConstants";
-import { User, createDefaultUser } from "../../model/valueObject/User";
-import { Department, DEFAULT_DEPARTMENT } from "../../model/valueObject/Department";
-import { ApplicationFacade } from "../../ApplicationFacade";
-import { MaterialIcons } from "@expo/vector-icons";
+import {Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {RouteProp} from "@react-navigation/native";
+import {StackNavigationProp} from "@react-navigation/stack";
+import {Picker} from "@react-native-picker/picker";
+import {ApplicationConstants, ParamList} from "../../ApplicationConstants";
+import {createDefaultUser, User} from "../../model/valueObject/User";
+import {DEFAULT_DEPARTMENT, Department} from "../../model/valueObject/Department";
+import {ApplicationFacade} from "../../ApplicationFacade";
+import {MaterialIcons} from "@expo/vector-icons";
 
 interface Props {
   navigation: StackNavigationProp<ParamList, "UserForm">;
@@ -29,7 +29,7 @@ export interface IUserForm {
   update: (user: User) => Promise<void>,
 }
 
-const UserForm: React.FC<Props> = ( {navigation, route} ) => {
+const UserForm: React.FC<Props> = ({navigation, route}) => {
 
   const [departments, setDepartments] = useState<Department[]>([]); // UI Data
   const [user, setUser] = useState<User>(createDefaultUser()); // User Data
@@ -41,8 +41,10 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   const delegate = useRef<IUserForm>({
     findAllDepartments: async (): Promise<Department[]> => [],
     findUserById: async (_id: number): Promise<User> => createDefaultUser(),
-    save: async (_user: User): Promise<void> => {},
-    update: async (_user: User): Promise<void> => {},
+    save: async (_user: User): Promise<void> => {
+    },
+    update: async (_user: User): Promise<void> => {
+    },
   }).current;
 
   useEffect(() => {
@@ -72,21 +74,24 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   // text fields handler
   const onChange = (field: keyof User, value: string) => {
     setUser((state: User) => (
-      { ...state, [field]: value } as User
+      {...state, [field]: value} as User
     ));
   }
 
   // department handler
   const onValueChange = (value: number, index: number) => {
     setUser((state: User) => (
-      { ...state, department: value === 0 ? DEFAULT_DEPARTMENT : departments.find(department => department.id === value)} as User
+      {
+        ...state,
+        department: value === 0 ? DEFAULT_DEPARTMENT : departments.find(department => department.id === value)
+      } as User
     ));
     setTimeout(() => setIsPickerVisible(false), 150);
   }
 
   // Roles handler
   const onRoles = (event: any) => {
-    navigation.navigate("UserRole", { user: user });
+    navigation.navigate("UserRole", {user: user});
   }
 
   // save handler
@@ -125,27 +130,33 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
   );
 
   function first() {
-    return (<TextInput style={styles.input} placeholder="First Name" value={user?.first} onChangeText={(value) => onChange("first", value)} />);
+    return (<TextInput style={styles.input} placeholder="First Name" value={user?.first}
+                       onChangeText={(value) => onChange("first", value)}/>);
   }
 
   function last() {
-    return (<TextInput style={styles.input} placeholder="Last Name" value={user?.last} onChangeText={(value) => onChange("last", value)} />);
+    return (<TextInput style={styles.input} placeholder="Last Name" value={user?.last}
+                       onChangeText={(value) => onChange("last", value)}/>);
   }
 
   function email() {
-    return (<TextInput style={styles.input} placeholder="Email" value={user?.email} onChangeText={(value) => onChange("email", value)} keyboardType="email-address" />);
+    return (<TextInput style={styles.input} placeholder="Email" value={user?.email}
+                       onChangeText={(value) => onChange("email", value)} keyboardType="email-address"/>);
   }
 
   function username() {
-    return (<TextInput style={styles.input} placeholder="Username" value={user?.username} onChangeText={(value) => onChange("username", value)} />);
+    return (<TextInput style={styles.input} placeholder="Username" value={user?.username}
+                       onChangeText={(value) => onChange("username", value)}/>);
   }
 
   function password() {
-    return (<TextInput style={styles.input} placeholder="Password" value={user?.password} onChangeText={(value) => setUser( ({...user, password: value } as User) )} />);
+    return (<TextInput style={styles.input} placeholder="Password" value={user?.password}
+                       onChangeText={(value) => setUser(({...user, password: value} as User))}/>);
   }
 
   function confirm() {
-    return (<TextInput style={styles.input} placeholder="Confirm" value={user?.confirm} onChangeText={(value) => setUser( ({...user, confirm: value } as User) )} />);
+    return (<TextInput style={styles.input} placeholder="Confirm" value={user?.confirm}
+                       onChangeText={(value) => setUser(({...user, confirm: value} as User))}/>);
   }
 
   function department() {
@@ -154,17 +165,19 @@ const UserForm: React.FC<Props> = ( {navigation, route} ) => {
         {isIOS && (
           <TouchableOpacity style={styles.iosTrigger} onPress={() => setIsPickerVisible((flag) => !flag)}>
             <Text style={styles.iosDisplayText}>
-              {departments.find((department) => department.id === user.department.id)?.name ?? DEFAULT_DEPARTMENT.name }
+              {departments.find((department) => department.id === user.department.id)?.name ?? DEFAULT_DEPARTMENT.name}
             </Text>
-            <MaterialIcons name={isPickerVisible ? "arrow-drop-up" : "arrow-drop-down"} size={24} color="#666" style={styles.arrow} />
+            <MaterialIcons name={isPickerVisible ? "arrow-drop-up" : "arrow-drop-down"} size={24} color="#666"
+                           style={styles.arrow}/>
           </TouchableOpacity>
         )}
 
         {(isAndroid || (isIOS && isPickerVisible)) && (
-          <Picker itemStyle={{fontSize: 16}}  selectedValue={user.department.id} onValueChange={onValueChange} style={isAndroid ? undefined : styles.iosPicker} mode={isAndroid ? "dropdown" : undefined}>
-            <Picker.Item label={DEFAULT_DEPARTMENT.name} value={0} />
+          <Picker itemStyle={{fontSize: 16}} selectedValue={user.department.id} onValueChange={onValueChange}
+                  style={isAndroid ? undefined : styles.iosPicker} mode={isAndroid ? "dropdown" : undefined}>
+            <Picker.Item label={DEFAULT_DEPARTMENT.name} value={0}/>
             {departments.map((department) => (
-              <Picker.Item key={department.id.toString()} label={department.name} value={department.id} />
+              <Picker.Item key={department.id.toString()} label={department.name} value={department.id}/>
             ))}
           </Picker>
         )}
@@ -299,7 +312,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 5,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.15,
     shadowRadius: 4,
   },

@@ -7,7 +7,7 @@
 //
 
 import {DEFAULT_DEPARTMENT, Department} from "./Department";
-import { Role } from "./Role";
+import {Role} from "./Role";
 
 export interface User {
   id: number;

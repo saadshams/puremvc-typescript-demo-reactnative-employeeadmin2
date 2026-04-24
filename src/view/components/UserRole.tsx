@@ -7,14 +7,13 @@
 //
 
 import React, {useEffect, useRef, useState} from "react";
-import { ScrollView, StyleSheet, View, Text } from "react-native";
-import { RouteProp } from "@react-navigation/native";
-import { Button } from 'react-native';
+import {Button, ScrollView, StyleSheet, Text, View} from "react-native";
+import {RouteProp} from "@react-navigation/native";
 import Checkbox from 'expo-checkbox';
-import { StackNavigationProp } from "@react-navigation/stack";
-import { ApplicationConstants, ParamList } from "../../ApplicationConstants";
-import { Role } from "../../model/valueObject/Role";
-import { ApplicationFacade } from "../../ApplicationFacade";
+import {StackNavigationProp} from "@react-navigation/stack";
+import {ApplicationConstants, ParamList} from "../../ApplicationConstants";
+import {Role} from "../../model/valueObject/Role";
+import {ApplicationFacade} from "../../ApplicationFacade";
 
 interface Props {
   navigation: StackNavigationProp<ParamList, "UserRole">;
@@ -26,7 +25,7 @@ export interface IUserRole {
   findRolesByUserId: (id: number) => Promise<Role[]>
 }
 
-const UserRole: React.FC<Props> = ({ navigation, route }) => {
+const UserRole: React.FC<Props> = ({navigation, route}) => {
 
   const [roles, setRoles] = useState<Role[]>([]); // UI Data
   const [data, setData] = useState<Role[]>([]); // User Data
@@ -74,7 +73,7 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
     navigation.goBack();
   }
 
-  return(
+  return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
         {list()}
@@ -90,7 +89,7 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
       <>
         {roles?.map((role: Role) => (
           <View key={`role_${role.id}`} style={styles.item}>
-            <Checkbox value={data.some(r => r.id === role.id)} onValueChange={() => onChange(role)} />
+            <Checkbox value={data.some(r => r.id === role.id)} onValueChange={() => onChange(role)}/>
             <Text style={styles.label}>{role.name}</Text>
             {/*<Checkbox title={role.name} containerStyle={styles.checkbox}*/}
             {/*          checked={data.some(r => r.id === role.id)} onPress={() => onChange(role)}*/}
@@ -102,11 +101,11 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
   }
 
   function cancel() {
-    return (<Button title="Cancel" onPress={onCancel} />);
+    return (<Button title="Cancel" onPress={onCancel}/>);
   }
 
   function save() {
-    return (<Button title="Save" onPress={onSave} />);
+    return (<Button title="Save" onPress={onSave}/>);
   }
 }
 

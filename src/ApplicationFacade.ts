@@ -6,9 +6,9 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import { Facade } from "@puremvc/puremvc-typescript-multicore-framework";
-import { StartupCommand } from "./controller/StartupCommand";
-import { ApplicationConstants } from "./ApplicationConstants";
+import {Facade} from "@puremvc/puremvc-typescript-multicore-framework";
+import {StartupCommand} from "./controller/StartupCommand";
+import {ApplicationConstants} from "./ApplicationConstants";
 
 export class ApplicationFacade extends Facade {
 

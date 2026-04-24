@@ -14,7 +14,7 @@ import { ApplicationConstants } from "../ApplicationConstants";
 
 export class StartupCommand extends SimpleCommand {
 
-  execute(_: INotification) {
+  execute(_notification: INotification) {
     this.facade.registerCommand(ApplicationConstants.REGISTER, () => new RegisterCommand());
     this.facade.registerCommand(ApplicationConstants.UNREGISTER, () => new RegisterCommand());
 

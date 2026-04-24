@@ -65,11 +65,10 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <FlatList<Partial<User>>
-        data={users}
-        ListEmptyComponent={<Text>No Users Found</Text>}
+      <FlatList<Partial<User>> data={users}
         keyExtractor={(user) => `user_${user.id}`}
-        renderItem={({ item }) => <ListItem item={item} />}
+        renderItem={({ item }) => <ListItem item={item}/>}
+        ListEmptyComponent={<Text>No Users Found</Text>}
       />
     </View>
   );

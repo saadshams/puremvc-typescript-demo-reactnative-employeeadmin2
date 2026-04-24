@@ -6,9 +6,9 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import { Mediator } from "@puremvc/puremvc-typescript-multicore-framework";
-import { RoleProxy } from "../model/RoleProxy";
-import { IUserRole } from "./components/UserRole";
+import {Mediator} from "@puremvc/puremvc-typescript-multicore-framework";
+import {RoleProxy} from "../model/RoleProxy";
+import {IUserRole} from "./components/UserRole";
 
 export class UserRoleMediator extends Mediator {
 
@@ -35,7 +35,7 @@ export class UserRoleMediator extends Mediator {
     return await this.roleProxy.findRolesById(id);
   }
 
-  public get delegate() : IUserRole {
+  public get delegate(): IUserRole {
     return this.viewComponent
   }
 

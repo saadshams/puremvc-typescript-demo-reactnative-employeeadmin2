@@ -11,4 +11,4 @@ export interface Department {
   name: string;
 }
 
-export const DEFAULT_DEPARTMENT: Department = { id: 0, name: "None Selected" };
+export const DEFAULT_DEPARTMENT: Department = {id: 0, name: "None Selected"};
