@@ -6,7 +6,7 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
 import { RouteProp } from "@react-navigation/native";
 import { Button } from 'react-native';
@@ -80,8 +80,7 @@ const UserRole: React.FC<Props> = ({ navigation, route }) => {
         {list()}
       </ScrollView>
       <View style={styles.sticky}>
-        {cancel()}
-        {save()}
+        <>{cancel()}{save()}</>
       </View>
     </View>
   );
