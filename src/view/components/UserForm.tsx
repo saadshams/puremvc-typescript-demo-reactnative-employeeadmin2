@@ -55,21 +55,17 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
         console.error("Failed to load departments:", error);
       }
 
-      console.log(route.params?.user.id);
       if (!route.params?.user.id) return; // if id is passed from UserList
       try {
         let data = await delegate.findUserById(route.params.user.id)
         setUser({...data, confirm: data.password});
-        console.log("after");
       } catch (error) {
         console.error("Failed to load user:", error);
       }
     })();
 
     return () => {
-      console.log("cleanup");
       ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_FORM)
-      console.log("clean up after")
     }
   }, []);
 
