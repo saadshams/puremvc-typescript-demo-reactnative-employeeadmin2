@@ -41,10 +41,8 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   const delegate = useRef<IUserForm>({
     findAllDepartments: async (): Promise<Department[]> => [],
     findUserById: async (_id: number): Promise<User> => createDefaultUser(),
-    save: async (_user: User): Promise<void> => {
-    },
-    update: async (_user: User): Promise<void> => {
-    },
+    save: async (_user: User): Promise<void> => {},
+    update: async (_user: User): Promise<void> => {},
   }).current;
 
   useEffect(() => {
@@ -57,17 +55,21 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
         console.error("Failed to load departments:", error);
       }
 
-      if (!route.params?.user.id) return; // if id is passed from UserList``
+      console.log(route.params?.user.id);
+      if (!route.params?.user.id) return; // if id is passed from UserList
       try {
         let data = await delegate.findUserById(route.params.user.id)
         setUser({...data, confirm: data.password});
+        console.log("after");
       } catch (error) {
         console.error("Failed to load user:", error);
       }
     })();
 
     return () => {
+      console.log("cleanup");
       ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_FORM)
+      console.log("clean up after")
     }
   }, []);
 
