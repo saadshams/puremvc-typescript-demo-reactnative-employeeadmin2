@@ -28,6 +28,7 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
 
   const [users, setUsers] = useState<Partial<User>[]>([]); // User Data
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error>();
 
   const delegate = useRef<IUserList>({
     findAllUsers: async (_signal: AbortSignal) => [],
@@ -42,18 +43,15 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
   useFocusEffect(
     useCallback(() => {
       const controller = new AbortController();
-      void (async () => {
-        try {
-          const data = await delegate.findAllUsers(controller.signal);
+      delegate.findAllUsers(controller.signal)
+        .then(data => {
           setUsers(data);
           setIsLoading(false);
-        } catch (error) {
-          console.error("Failed to sync users:", error);
-        }
-      })();
+        })
+        .catch(setError);
 
       return () => controller.abort()
-    }, [])
+    }, [delegate])
   );
 
   function ListItem({ user }: { user: Partial<User> }) {

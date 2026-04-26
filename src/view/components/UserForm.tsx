@@ -35,6 +35,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   const [departments, setDepartments] = useState<Department[]>([]); // UI Data
   const [user, setUser] = useState<User>(createDefaultUser()); // User Data
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error>();
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const isAndroid = Platform.OS === "android";
@@ -55,32 +56,21 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
 
   useEffect(() => {
     const controller = new AbortController();
-    (async () => {
-      try {
-        const data = await delegate.findAllDepartments(controller.signal);
-        setDepartments(data);
-      } catch (error) {
-        console.error("Failed to load departments:", error);
-      }
-    })();
-
+    delegate.findAllDepartments(controller.signal).then(setDepartments).catch(setError);
     return () => controller.abort();
-  }, []);
+  }, [delegate]);
 
   useEffect(() => {
     if (departments.length === 0) return;
 
     const controller = new AbortController();
-    (async () => {
-      try {
-        if (route?.params?.user.id === 0) return setIsLoading(false); // if id is passed from UserList
-        let data = await delegate.findUserById(route?.params?.user.id ?? 0, controller.signal)
+    if (route?.params?.user.id === 0) return setIsLoading(false); // if id is passed from UserList
+    delegate.findUserById(route?.params?.user.id ?? 0, controller.signal)
+      .then(data => {
         setUser({...data, confirm: data.password});
         setIsLoading(false);
-      } catch (error) {
-        console.error("Failed to load user:", error);
-      }
-    })();
+      })
+      .catch(setError);
 
     return () => controller.abort();
   }, [departments])

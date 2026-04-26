@@ -30,6 +30,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   const [roles, setRoles] = useState<Role[]>([]); // UI Data
   const [data, setData] = useState<Role[]>([]); // User Data
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error>();
 
   const delegate = useRef<IUserRole>({
     findAllRoles: async (): Promise<Role[]> => [],
@@ -42,26 +43,22 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const data = await delegate.findAllRoles();
-      setRoles(data);
-    })();
+    delegate.findAllRoles().then(setRoles).catch(setError);
   }, [delegate]);
 
   useEffect(() => {
     if (roles.length === 0) return;
 
-    (async () => {
-      if (route.params?.user.roles.length == 0) {
-        setData(route.params.user.roles);
-        setIsLoading(false);
-        return;
-      }
-      if (route.params?.user.id) {
-        setData(await delegate.findRolesByUserId(route.params.user.id));
-        setIsLoading(false);
-      }
-    })();
+    if (route.params?.user.roles.length == 0) {
+      setData(route.params.user.roles);
+      setIsLoading(false);
+      return;
+    }
+
+    if (route.params?.user.id) {
+      delegate.findRolesByUserId(route.params.user.id).then(setData).catch(setError);
+      setIsLoading(false);
+    }
   }, [roles]);
 
   const onChange = (role: Role) => {
