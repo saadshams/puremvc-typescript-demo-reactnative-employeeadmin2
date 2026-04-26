@@ -3,59 +3,28 @@ This demo illustrates techniques for performing routine client-side maintenance 
 
 ---
 
-## 🚀 Project Setup
-
-### 🟢 Managed (Recommended)
-
-```bash
-npx create-expo-app EmployeeAdmin --template blank-typescript
-npx expo install react-native-gesture-handler react-native-screens react-native-safe-area-context @react-native-masked-view/masked-view
+## ⚙️ Installation
+### 🐳 Docker (🧩API services)
+```shell
+git clone https://github.com/PureMVC/puremvc-js-demo-microservice-employeeadmin
+cd puremvc-js-demo-microservice-employeeadmin
+docker compose up
 ```
 
-* Easy setup, fast development
-* Works with Expo Go
-* Best for API + Redux apps
-
----
-
-### 🔴 Bare (Full Native Control)
-
-```bash
-npx create-expo-app EmployeeAdmin --template expo-template-bare-typescript
+### 📱 Run React Native Project
+```shell
+git clone https://github.com/PureMVC/puremvc-typescript-demo-reactnative-employeeadmin
+cd puremvc-typescript-demo-reactnative-employeeadmin
+npm start
 ```
 
-* Full access to iOS/Android code
-* Supports native modules, TurboModules
-* More setup required
-
----
-
-### 🟡 Dev Build (Hybrid)
-
-```bash
-npx expo prebuild
-npx expo run:ios
-```
-
-* Start Managed → add native later
-
----
-
-### 🍎 **Run on iOS**
-Press **Shift + I** to list simulators, then select one (e.g., iPhone 17 Pro).
-
-### 🤖 **Run on Android**
-Press **Shift + A** to list emulators/phones, then select a device (e.g., Pixel 9 Pro).
-
----
-
-## Platforms / Technologies
+## 🧩 Platforms / Technologies
 * [ReactNative](https://en.wikipedia.org/wiki/React_Native)
 * [TypeScript](https://en.wikipedia.org/wiki/TypeScript)
 * [JavaScript](http://en.wikipedia.org/wiki/JavaScript)
 * [ECMA](https://en.wikipedia.org/wiki/ECMAScript)
 
-## License
+## 📜 License
 * PureMVC TypeScript React Native Demo - Employee Admin - Copyright © 2026 [Saad Shams](https://www.linkedin.com/in/muizz)
 * PureMVC Copyright © 2026 Futurescale, Inc.
 * All rights reserved.
