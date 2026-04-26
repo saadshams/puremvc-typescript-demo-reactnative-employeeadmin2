@@ -108,9 +108,6 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
           <View key={`role_${role.id}`} style={styles.item}>
             <Checkbox value={data.some(r => r.id === role.id)} onValueChange={() => onChange(role)}/>
             <Text style={styles.label}>{role.name}</Text>
-            {/*<Checkbox title={role.name} containerStyle={styles.checkbox}*/}
-            {/*          checked={data.some(r => r.id === role.id)} onPress={() => onChange(role)}*/}
-            {/*          iconType="material-community" checkedIcon="checkbox-outline" uncheckedIcon={"checkbox-blank-outline"} />*/}
           </View>
         ))}
       </>
