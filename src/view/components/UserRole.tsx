@@ -93,11 +93,11 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
 
   const onSave = () => {
     route.params.user.roles = data;
-    navigation.goBack();
+    if (navigation.canGoBack()) navigation.goBack();
   }
 
   const onCancel = () => {
-    navigation.goBack();
+    if (navigation.canGoBack()) navigation.goBack();
   }
 
   // UI Helpers
