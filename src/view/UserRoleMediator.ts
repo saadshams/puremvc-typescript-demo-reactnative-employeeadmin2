@@ -21,18 +21,18 @@ export class UserRoleMediator extends Mediator {
   }
 
   public async onRegister() {
-    this.delegate.findAllRoles = () => this.findAllRoles();
-    this.delegate.findRolesByUserId = id => this.findRolesByUserId(id)
+    this.delegate.findAllRoles = (signal: AbortSignal) => this.findAllRoles(signal);
+    this.delegate.findRolesByUserId = (id: number, signal: AbortSignal) => this.findRolesByUserId(id, signal)
 
     this.roleProxy = this.facade.retrieveProxy(RoleProxy.NAME) as RoleProxy;
   }
 
-  private async findAllRoles() {
-    return await this.roleProxy.findAllRoles();
+  private async findAllRoles(signal: AbortSignal) {
+    return await this.roleProxy.findAllRoles(signal);
   }
 
-  private async findRolesByUserId(id: number) {
-    return await this.roleProxy.findRolesById(id);
+  private async findRolesByUserId(id: number, signal: AbortSignal) {
+    return await this.roleProxy.findRolesById(id, signal);
   }
 
   public get delegate(): IUserRole {

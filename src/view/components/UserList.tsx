@@ -43,15 +43,20 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
   useFocusEffect(
     useCallback(() => {
       const controller = new AbortController();
-      delegate.findAllUsers(controller.signal)
-        .then(data => {
-          setUsers(data);
-          setIsLoading(false);
-        })
-        .catch(setError);
 
-      return () => controller.abort()
-    }, [delegate])
+      void (async () => {
+        try {
+          setUsers(await delegate.findAllUsers(controller.signal));
+        } catch (error) {
+          if (!controller.signal.aborted)
+            setError(error instanceof Error ? error : new Error(String(error)));
+        } finally {
+          if (!controller.signal.aborted) setIsLoading(false);
+        }
+      })();
+
+      return () => controller.abort();
+    }, [])
   );
 
   function ListItem({ user }: { user: Partial<User> }) {

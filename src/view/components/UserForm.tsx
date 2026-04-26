@@ -56,21 +56,38 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
 
   useEffect(() => {
     const controller = new AbortController();
-    delegate.findAllDepartments(controller.signal).then(setDepartments).catch(setError);
+
+    void (async () => {
+      try {
+        setDepartments(await delegate.findAllDepartments(controller.signal));
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setError(error instanceof Error ? error : new Error(String(error)));
+      }
+    })();
+
     return () => controller.abort();
-  }, [delegate]);
+  }, []);
 
   useEffect(() => {
-    if (departments.length === 0) return;
-
+    if (departments.length === 0) return () => {};
     const controller = new AbortController();
-    if (route?.params?.user.id === 0) return setIsLoading(false); // if id is passed from UserList
-    delegate.findUserById(route?.params?.user.id ?? 0, controller.signal)
-      .then(data => {
-        setUser({...data, confirm: data.password});
-        setIsLoading(false);
-      })
-      .catch(setError);
+
+    void (async () => {
+      try {
+        const id = route?.params?.user?.id ?? 0;
+        if (id === 0) return setIsLoading(false);
+        const data = await delegate.findUserById(id, controller.signal);
+
+        if (!controller.signal.aborted)
+          setUser({ ...data, confirm: data.password });
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setError(error instanceof Error ? error : new Error(String(error)));
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
+      }
+    })();
 
     return () => controller.abort();
   }, [departments])

@@ -18,23 +18,23 @@ export class RoleProxy extends Proxy {
     super(RoleProxy.NAME, null);
   }
 
-  public async findAllRoles(): Promise<Role[]> {
-    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/roles`);
+  public async findAllRoles(signal: AbortSignal): Promise<Role[]> {
+    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/roles`, {signal});
     if (response.status === 200) {
       return await response.json();
     } else {
-      const error = await response.json();
-      throw new Error(error.message);
+      const error = await response.json().catch(() => null);
+      throw new Error(error?.message ?? `Request failed: ${response.status}`);
     }
   }
 
-  public async findRolesById(id: number): Promise<Role[]> {
-    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users/${id}/roles`);
+  public async findRolesById(id: number, signal: AbortSignal): Promise<Role[]> {
+    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users/${id}/roles`, {signal});
     if (response.status === 200) {
       return await response.json();
     } else {
-      const error = await response.json();
-      throw new Error(error.message);
+      const error = await response.json().catch(() => null);
+      throw new Error(error?.message ?? `Request failed: ${response.status}`);
     }
   }
 
@@ -48,8 +48,8 @@ export class RoleProxy extends Proxy {
     if (response.status === 200) {
       return await response.json();
     } else {
-      const error = await response.json();
-      throw new Error(error.message);
+      const error = await response.json().catch(() => null);
+      throw new Error(error?.message ?? `Request failed: ${response.status}`);
     }
   }
 }

@@ -21,8 +21,8 @@ interface Props {
 }
 
 export interface IUserRole {
-  findAllRoles: () => Promise<Role[]>,
-  findRolesByUserId: (id: number) => Promise<Role[]>
+  findAllRoles: (signal: AbortSignal) => Promise<Role[]>,
+  findRolesByUserId: (id: number, signal: AbortSignal) => Promise<Role[]>
 }
 
 const UserRole: React.FC<Props> = ({navigation, route}) => {
@@ -33,8 +33,8 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   const [error, setError] = useState<Error>();
 
   const delegate = useRef<IUserRole>({
-    findAllRoles: async (): Promise<Role[]> => [],
-    findRolesByUserId: async (_id: number): Promise<Role[]> => [],
+    findAllRoles: async (_signal: AbortSignal): Promise<Role[]> => [],
+    findRolesByUserId: async (_id: number, _signal): Promise<Role[]> => [],
   }).current;
 
   useEffect(() => {
@@ -43,22 +43,42 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   }, []);
 
   useEffect(() => {
-    delegate.findAllRoles().then(setRoles).catch(setError);
-  }, [delegate]);
+    const controller = new AbortController();
+
+    void (async () => {
+      try {
+        setRoles(await delegate.findAllRoles(controller.signal));
+      } catch (error) {
+        setError(error instanceof Error ? error : new Error(String(error)));
+      }
+    })();
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     if (roles.length === 0) return;
 
     if (route.params?.user.roles.length == 0) {
-      setData(route.params.user.roles);
-      setIsLoading(false);
-      return;
+      return setIsLoading(false);
     }
 
-    if (route.params?.user.id) {
-      delegate.findRolesByUserId(route.params.user.id).then(setData).catch(setError);
-      setIsLoading(false);
-    }
+    const controller = new AbortController();
+
+    void (async () => {
+      try {
+        if (route.params?.user.roles.length === 0 || route.params?.user.id === 0) {
+          return setData(route.params?.user.roles);
+        }
+        setData(await delegate.findRolesByUserId(route.params?.user.id, controller.signal));
+      } catch (error) {
+        setError(error instanceof Error ? error : new Error(String(error)));
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
+      }
+    })();
+
+    return () => controller.abort();
   }, [roles]);
 
   const onChange = (role: Role) => {
