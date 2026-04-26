@@ -27,6 +27,7 @@ export interface IUserRole {
 
 const UserRole: React.FC<Props> = ({navigation, route}) => {
 
+  // State
   const [roles, setRoles] = useState<Role[]>([]); // UI Data
   const [data, setData] = useState<Role[]>([]); // User Data
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -37,6 +38,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
     findRolesByUserId: async (_id: number, _signal): Promise<Role[]> => [],
   }).current;
 
+  // Effects
   useEffect(() => {
     ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_ROLE);
     return () => ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_ROLE);
@@ -81,6 +83,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
     return () => controller.abort();
   }, [roles]);
 
+  // Handlers
   const onChange = (role: Role) => {
     setData((state) => {
       if (state.some(r => r.id === role.id)) {
@@ -139,7 +142,6 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
         </View>
       )}
     </>
-
   );
 }
 

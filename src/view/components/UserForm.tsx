@@ -31,7 +31,7 @@ export interface IUserForm {
 
 const UserForm: React.FC<Props> = ({navigation, route}) => {
 
-  // State, Refs
+  // State
   const [departments, setDepartments] = useState<Department[]>([]); // UI Data
   const [user, setUser] = useState<User>(createDefaultUser()); // User Data
   const [isLoading, setIsLoading] = useState(true);

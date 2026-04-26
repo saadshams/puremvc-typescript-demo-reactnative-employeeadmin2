@@ -26,6 +26,7 @@ export interface IUserList {
 
 const UserList: React.FC<Props> = ({navigation, route}) => {
 
+  // State
   const [users, setUsers] = useState<Partial<User>[]>([]); // User Data
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error>();
@@ -35,6 +36,7 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
     deleteById: async (_id: number) => {},
   }).current;
 
+  // Effects
   useEffect(() => {
     ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_LIST)
     return () => ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_LIST);
@@ -59,6 +61,7 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
     }, [])
   );
 
+  // UI Helpers
   function ListItem({ user }: { user: Partial<User> }) {
     const translateX = useRef(new Animated.Value(0)).current;
 
@@ -84,7 +87,7 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
             await delegate.deleteById(user.id);
             setUsers((prev) => prev.filter((user) => user.id !== user.id));
           } catch (error) {
-            console.error("Failed to delete user:", error);
+            setError(error instanceof Error ? error : new Error(String(error)));
           }
         }}>
           <Text style={styles.deleteText}>Delete</Text>
