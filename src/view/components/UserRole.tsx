@@ -47,7 +47,6 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
         return;
       }
       if (route.params?.user.id) {
-        setIsLoading(true);
         setData(await delegate.findRolesByUserId(route.params.user.id));
         setIsLoading(false);
       }
