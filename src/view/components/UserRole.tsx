@@ -7,7 +7,7 @@
 //
 
 import React, {useEffect, useRef, useState} from "react";
-import {Button, ScrollView, StyleSheet, Text, View} from "react-native";
+import {ActivityIndicator, Button, ScrollView, StyleSheet, Text, View} from "react-native";
 import {RouteProp} from "@react-navigation/native";
 import Checkbox from 'expo-checkbox';
 import {StackNavigationProp} from "@react-navigation/stack";
@@ -29,6 +29,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
 
   const [roles, setRoles] = useState<Role[]>([]); // UI Data
   const [data, setData] = useState<Role[]>([]); // User Data
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const delegate = useRef<IUserRole>({
     findAllRoles: async (): Promise<Role[]> => [],
@@ -40,12 +41,15 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
 
     (async () => {
       setRoles(await delegate.findAllRoles());
-      if (route.params?.user.roles.length > 0) {
+      if (route.params?.user.roles.length == 0) {
         setData(route.params.user.roles);
+        setIsLoading(false);
         return;
       }
       if (route.params?.user.id) {
+        setIsLoading(true);
         setData(await delegate.findRolesByUserId(route.params.user.id));
+        setIsLoading(false);
       }
     })();
 
@@ -73,17 +77,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
     navigation.goBack();
   }
 
-  return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        {list()}
-      </ScrollView>
-      <View style={styles.sticky}>
-        <>{cancel()}{save()}</>
-      </View>
-    </View>
-  );
-
+  // UI Helpers
   function list() {
     return (
       <>
@@ -107,9 +101,34 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   function save() {
     return (<Button title="Save" onPress={onSave}/>);
   }
+
+  return (
+    <>
+      { isLoading ? (
+        <View style={styles.spinnerContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
+        <View style={styles.container}>
+          <ScrollView style={styles.scrollView}>
+            {list()}
+          </ScrollView>
+          <View style={styles.sticky}>
+            <>{cancel()}{save()}</>
+          </View>
+        </View>
+      )}
+    </>
+
+  );
 }
 
 const styles = StyleSheet.create({
+  spinnerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
   },

@@ -7,7 +7,7 @@
 //
 
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {Animated, FlatList, PanResponder, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, Animated, FlatList, PanResponder, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {StackNavigationProp} from "@react-navigation/stack";
 import {RouteProp, useFocusEffect} from "@react-navigation/native";
 import {ApplicationConstants, ParamList} from "../../ApplicationConstants";
@@ -27,6 +27,7 @@ export interface IUserList {
 const UserList: React.FC<Props> = ({navigation, route}) => {
 
   const [users, setUsers] = useState<Partial<User>[]>([]); // User Data
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const delegate = useRef<IUserList>({
     findAllUsers: async () => [],
@@ -48,6 +49,7 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
         try {
           const data = await delegate.findAllUsers();
           if (isActive) setUsers(data);
+          setIsLoading(false);
         } catch (error) {
           console.error("Failed to sync users:", error);
         }
@@ -64,13 +66,22 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList<Partial<User>> data={users}
-        keyExtractor={(user) => `user_${user.id}`}
-        renderItem={({ item }) => <ListItem item={item}/>}
-        ListEmptyComponent={<Text>No Users Found</Text>}
-      />
-    </View>
+    <>
+      { isLoading ? (
+        <View style={styles.spinnerContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : users.length == 0 ? (
+        <Text>No Users Found</Text>
+      ) : (
+        <View style={styles.container}>
+          <FlatList<Partial<User>> data={users}
+            keyExtractor={(user) => `user_${user.id}`}
+            renderItem={({ item }) => <ListItem item={item}/>}
+          />
+        </View>
+      )}
+    </>
   );
 
   function ListItem({ item }: { item: Partial<User> }) {
@@ -117,10 +128,15 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
         </Animated.View>
       </View>
     );
-  };
+  }
 }
 
 const styles = StyleSheet.create({
+  spinnerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
   },

@@ -7,7 +7,7 @@
 //
 
 import React, {useEffect, useRef, useState} from "react";
-import {Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {RouteProp} from "@react-navigation/native";
 import {StackNavigationProp} from "@react-navigation/stack";
 import {Picker} from "@react-native-picker/picker";
@@ -31,6 +31,7 @@ export interface IUserForm {
 
 const UserForm: React.FC<Props> = ({navigation, route}) => {
 
+  // State, Refs
   const [departments, setDepartments] = useState<Department[]>([]); // UI Data
   const [user, setUser] = useState<User>(createDefaultUser()); // User Data
 
@@ -43,21 +44,22 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
     findUserById: async (_id: number): Promise<User> => createDefaultUser(),
     save: async (_user: User): Promise<void> => {},
     update: async (_user: User): Promise<void> => {},
-  }).current;
+  });
 
+  // Effects
   useEffect(() => {
-    ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_FORM);
+    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_FORM);
 
     (async () => {
       try {
-        setDepartments(await delegate.findAllDepartments());
+        setDepartments(await delegate.current.findAllDepartments());
       } catch (error) {
         console.error("Failed to load departments:", error);
       }
 
       if (!route.params?.user.id) return; // if id is passed from UserList
       try {
-        let data = await delegate.findUserById(route.params.user.id)
+        let data = await delegate.current.findUserById(route.params.user.id)
         setUser({...data, confirm: data.password});
       } catch (error) {
         console.error("Failed to load user:", error);
@@ -69,15 +71,14 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
     }
   }, []);
 
-  // text fields handler
+  // Handlers
   const onChange = (field: keyof User, value: string) => {
     setUser((state: User) => (
       {...state, [field]: value} as User
     ));
   }
 
-  // department handler
-  const onValueChange = (value: number, index: number) => {
+  const onValueChange = (value: number, index: number) => { // department handler
     setUser((state: User) => (
       {
         ...state,
@@ -87,46 +88,31 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
     setTimeout(() => setIsPickerVisible(false), 150);
   }
 
-  // Roles handler
-  const onRoles = (event: any) => {
+  const onRoles = (event: any) => { // Roles handler
     navigation.navigate("UserRole", {user: user});
   }
 
-  // save handler
-  const onSave = async (event: any) => {
+  const onSave = async (event: any) => { // save handler
     try {
-      user.id === 0 ? await delegate.save(user) : await delegate.update(user);
-      navigation.goBack();
+      user.id === 0 ? await delegate.current.save(user) : await delegate.current.update(user);
+      // navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
+
     } catch (error) {
       console.error("Failed to save user:", error);
     }
   }
 
-  // cancel handler
-  const onCancel = (event: any) => {
-    navigation.goBack();
+  const onCancel = (event: any) => { // cancel handler
+    // navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    }
   }
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.row}>
-        <>{first()}{last()}</>
-      </View>
-      <View style={styles.row}>
-        <>{email()}{username()}</>
-      </View>
-      <View style={styles.row}>
-        <>{password()}{confirm()}</>
-      </View>
-      <View style={styles.row}>
-        <>{department()}{roles()}</>
-      </View>
-      <View style={styles.row}>
-        <>{cancel()}{save()}</>
-      </View>
-    </ScrollView>
-  );
-
+  // UI Helpers
   function first() {
     return (<TextInput style={styles.input} placeholder="First Name" value={user?.first}
                        onChangeText={(value) => onChange("first", value)}/>);
@@ -165,8 +151,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
             <Text style={styles.iosDisplayText}>
               {departments.find((department) => department.id === user.department.id)?.name ?? DEFAULT_DEPARTMENT.name}
             </Text>
-            <MaterialIcons name={isPickerVisible ? "arrow-drop-up" : "arrow-drop-down"} size={24} color="#666"
-                           style={styles.arrow}/>
+            <MaterialIcons name={isPickerVisible ? "arrow-drop-up" : "arrow-drop-down"} size={24} color="#666" style={styles.arrow}/>
           </TouchableOpacity>
         )}
 
@@ -207,9 +192,41 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
     );
   }
 
+  return (
+    <>
+      { route?.params?.user?.id && route?.params.user?.username == "" ? (
+        <View style={styles.spinnerContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.row}>
+            <>{first()}{last()}</>
+          </View>
+          <View style={styles.row}>
+            <>{email()}{username()}</>
+          </View>
+          <View style={styles.row}>
+            <>{password()}{confirm()}</>
+          </View>
+          <View style={styles.row}>
+            <>{department()}{roles()}</>
+          </View>
+          <View style={styles.row}>
+            <>{cancel()}{save()}</>
+          </View>
+        </ScrollView>
+      )}
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
+  spinnerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     padding: 16,
