@@ -44,22 +44,22 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
     findUserById: async (_id: number): Promise<User> => createDefaultUser(),
     save: async (_user: User): Promise<void> => {},
     update: async (_user: User): Promise<void> => {},
-  });
+  }).current;
 
   // Effects
   useEffect(() => {
-    ApplicationFacade.getInstance().register(delegate.current, ApplicationConstants.USER_FORM);
+    ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_FORM);
 
     (async () => {
       try {
-        setDepartments(await delegate.current.findAllDepartments());
+        setDepartments(await delegate.findAllDepartments());
       } catch (error) {
         console.error("Failed to load departments:", error);
       }
 
       if (!route.params?.user.id) return; // if id is passed from UserList
       try {
-        let data = await delegate.current.findUserById(route.params.user.id)
+        let data = await delegate.findUserById(route.params.user.id)
         setUser({...data, confirm: data.password});
       } catch (error) {
         console.error("Failed to load user:", error);
@@ -94,7 +94,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
 
   const onSave = async (event: any) => { // save handler
     try {
-      user.id === 0 ? await delegate.current.save(user) : await delegate.current.update(user);
+      user.id === 0 ? await delegate.save(user) : await delegate.update(user);
       // navigation.goBack();
       if (navigation.canGoBack()) {
         navigation.goBack();
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     overflow: 'hidden',
     justifyContent: 'center', // vertical centering
-    height: Platform.OS === 'ios' ? 150 : 50, // iOS wheel taller
+    height: Platform.OS === 'ios' ? 150 : 50,
   },
   picker: {
     flex: 1,  // fills container

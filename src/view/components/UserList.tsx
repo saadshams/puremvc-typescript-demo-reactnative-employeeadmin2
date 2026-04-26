@@ -61,9 +61,45 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
     }, [])
   );
 
-  const onPress = (user: Partial<User>) => {
-    navigation.navigate("UserForm", {user: user});
-  };
+  function ListItem({ item }: { item: Partial<User> }) {
+    const translateX = useRef(new Animated.Value(0)).current;
+
+    const responder = useRef(
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gesture) => {
+          return Math.abs(gesture.dx) > 10 && Math.abs(gesture.dx) > Math.abs(gesture.dy);
+        },
+        onPanResponderMove: (_, gesture) => {
+          if (gesture.dx < 0) translateX.setValue(Math.max(gesture.dx, -100));
+        },
+        onPanResponderRelease: (_, gesture) => {
+          Animated.spring(translateX, {toValue: gesture.dx < -50 ? -100 : 0, useNativeDriver: true,}).start();
+        },
+      })
+    ).current;
+
+    return (
+      <View style={styles.swipeRow}>
+        <TouchableOpacity style={styles.deleteAction} onPress={async () => {
+          if (!item.id) return;
+          try {
+            await delegate.deleteById(item.id);
+            setUsers((prev) => prev.filter((user) => user.id !== item.id));
+          } catch (error) {
+            console.error("Failed to delete user:", error);
+          }
+        }}>
+          <Text style={styles.deleteText}>Delete</Text>
+        </TouchableOpacity>
+
+        <Animated.View style={[styles.rowContent, { transform: [{ translateX }] }]} {...responder.panHandlers}>
+          <TouchableOpacity onPress={() => navigation.navigate("UserForm", {user: item}) }>
+            <Text style={styles.listItem}>{item.last}, {item.first}</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -83,52 +119,6 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
       )}
     </>
   );
-
-  function ListItem({ item }: { item: Partial<User> }) {
-    const translateX = useRef(new Animated.Value(0)).current;
-
-    const responder = useRef(
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_, gesture) => {
-          return Math.abs(gesture.dx) > 10 && Math.abs(gesture.dx) > Math.abs(gesture.dy);
-        },
-
-        onPanResponderMove: (_, gesture) => {
-          if (gesture.dx < 0) {
-            translateX.setValue(Math.max(gesture.dx, -100));
-          }
-        },
-
-        onPanResponderRelease: (_, gesture) => {
-          Animated.spring(translateX, {toValue: gesture.dx < -50 ? -100 : 0, useNativeDriver: true,}).start();
-        },
-      })
-    ).current;
-
-    const onDelete = async () => {
-      if (!item.id) return;
-      try {
-        await delegate.deleteById(item.id);
-        setUsers((prev) => prev.filter((user) => user.id !== item.id));
-      } catch (error) {
-        console.error("Failed to delete user:", error);
-      }
-    };
-
-    return (
-      <View style={styles.swipeRow}>
-        <TouchableOpacity style={styles.deleteAction} onPress={onDelete}>
-          <Text style={styles.deleteText}>Delete</Text>
-        </TouchableOpacity>
-
-        <Animated.View style={[styles.rowContent, { transform: [{ translateX }] }]} {...responder.panHandlers}>
-          <TouchableOpacity onPress={() => onPress(item)}>
-            <Text style={styles.listItem}>{item.last}, {item.first}</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    );
-  }
 }
 
 const styles = StyleSheet.create({
