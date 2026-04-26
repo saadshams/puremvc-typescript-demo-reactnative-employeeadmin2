@@ -20,7 +20,7 @@ interface Props {
 }
 
 export interface IUserList {
-  findAllUsers: () => Promise<Partial<User>[]>,
+  findAllUsers: (signal: AbortSignal) => Promise<Partial<User>[]>,
   deleteById: (id: number) => Promise<void>,
 }
 
@@ -30,38 +30,33 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const delegate = useRef<IUserList>({
-    findAllUsers: async () => [],
+    findAllUsers: async (_signal: AbortSignal) => [],
     deleteById: async (_id: number) => {},
   }).current;
 
   useEffect(() => {
     ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_LIST)
-
-    return () => {
-      ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_LIST)
-    };
+    return () => ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_LIST);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true;
+      const controller = new AbortController();
       void (async () => {
         try {
-          const data = await delegate.findAllUsers();
-          if (isActive) setUsers(data);
+          const data = await delegate.findAllUsers(controller.signal);
+          setUsers(data);
           setIsLoading(false);
         } catch (error) {
           console.error("Failed to sync users:", error);
         }
       })();
 
-      return () => {
-        isActive = false;
-      };
+      return () => controller.abort()
     }, [])
   );
 
-  function ListItem({ item }: { item: Partial<User> }) {
+  function ListItem({ user }: { user: Partial<User> }) {
     const translateX = useRef(new Animated.Value(0)).current;
 
     const responder = useRef(
@@ -81,10 +76,10 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
     return (
       <View style={styles.swipeRow}>
         <TouchableOpacity style={styles.deleteAction} onPress={async () => {
-          if (!item.id) return;
+          if (!user.id) return;
           try {
-            await delegate.deleteById(item.id);
-            setUsers((prev) => prev.filter((user) => user.id !== item.id));
+            await delegate.deleteById(user.id);
+            setUsers((prev) => prev.filter((user) => user.id !== user.id));
           } catch (error) {
             console.error("Failed to delete user:", error);
           }
@@ -93,8 +88,8 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
         </TouchableOpacity>
 
         <Animated.View style={[styles.rowContent, { transform: [{ translateX }] }]} {...responder.panHandlers}>
-          <TouchableOpacity onPress={() => navigation.navigate("UserForm", {user: item}) }>
-            <Text style={styles.listItem}>{item.last}, {item.first}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("UserForm", {user: user})}>
+            <Text style={styles.listItem}>{user.last}, {user.first}</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -113,7 +108,7 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
         <View style={styles.container}>
           <FlatList<Partial<User>> data={users}
             keyExtractor={(user) => `user_${user.id}`}
-            renderItem={({ item }) => <ListItem item={item}/>}
+            renderItem={({ item }) => <ListItem user={item}/>}
           />
         </View>
       )}

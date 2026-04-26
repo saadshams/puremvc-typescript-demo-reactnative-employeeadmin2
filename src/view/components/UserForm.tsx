@@ -23,8 +23,8 @@ interface Props {
 }
 
 export interface IUserForm {
-  findAllDepartments: () => Promise<Department[]>,
-  findUserById: (id: number) => Promise<User>,
+  findAllDepartments: (signal: AbortSignal) => Promise<Department[]>,
+  findUserById: (id: number, signal: AbortSignal) => Promise<User>,
   save: (user: User) => Promise<void>,
   update: (user: User) => Promise<void>,
 }
@@ -34,14 +34,15 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   // State, Refs
   const [departments, setDepartments] = useState<Department[]>([]); // UI Data
   const [user, setUser] = useState<User>(createDefaultUser()); // User Data
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const isAndroid = Platform.OS === "android";
   const isIOS = Platform.OS === "ios";
 
   const delegate = useRef<IUserForm>({
-    findAllDepartments: async (): Promise<Department[]> => [],
-    findUserById: async (_id: number): Promise<User> => createDefaultUser(),
+    findAllDepartments: async (_signal: AbortSignal): Promise<Department[]> => [],
+    findUserById: async (_id: number, _signal: AbortSignal): Promise<User> => user,
     save: async (_user: User): Promise<void> => {},
     update: async (_user: User): Promise<void> => {},
   }).current;
@@ -49,27 +50,40 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   // Effects
   useEffect(() => {
     ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_FORM);
+    return () => ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_FORM);
+  }, []);
 
+  useEffect(() => {
+    const controller = new AbortController();
     (async () => {
       try {
-        setDepartments(await delegate.findAllDepartments());
+        const data = await delegate.findAllDepartments(controller.signal);
+        setDepartments(data);
       } catch (error) {
         console.error("Failed to load departments:", error);
       }
+    })();
 
-      if (!route.params?.user.id) return; // if id is passed from UserList
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (departments.length === 0) return;
+
+    const controller = new AbortController();
+    (async () => {
       try {
-        let data = await delegate.findUserById(route.params.user.id)
+        if (route?.params?.user.id === 0) return setIsLoading(false); // if id is passed from UserList
+        let data = await delegate.findUserById(route?.params?.user.id ?? 0, controller.signal)
         setUser({...data, confirm: data.password});
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to load user:", error);
       }
     })();
 
-    return () => {
-      ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_FORM)
-    }
-  }, []);
+    return () => controller.abort();
+  }, [departments])
 
   // Handlers
   const onChange = (field: keyof User, value: string) => {
@@ -95,21 +109,14 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   const onSave = async (event: any) => { // save handler
     try {
       user.id === 0 ? await delegate.save(user) : await delegate.update(user);
-      // navigation.goBack();
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      }
-
+      if (navigation.canGoBack()) navigation.goBack();
     } catch (error) {
       console.error("Failed to save user:", error);
     }
   }
 
   const onCancel = (event: any) => { // cancel handler
-    // navigation.goBack();
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    }
+    if (navigation.canGoBack()) navigation.goBack();
   }
 
   // UI Helpers
@@ -194,7 +201,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
 
   return (
     <>
-      { route?.params?.user?.id && route?.params.user?.username == "" ? (
+      { isLoading ? (
         <View style={styles.spinnerContainer}>
           <ActivityIndicator size="large" />
         </View>

@@ -30,11 +30,10 @@ const Application: React.FC = () => {
         <Stack.Screen name="UserList" component={UserList} options={({navigation}) => ({
           title: "User List",
           headerRight: () => (
-            <TouchableOpacity onPress={() => {
-              navigation.navigate("UserForm", {user: createDefaultUser()})
-            }} style={{marginRight: 16}}>
+            <TouchableOpacity style={{marginRight: 16}} onPress={() => navigation.navigate("UserForm", {user: createDefaultUser()})}>
               <FontAwesome5 name="plus" size={24} color="#007AFF"/>
-            </TouchableOpacity>)
+            </TouchableOpacity>
+          )
         })}/>
         <Stack.Screen name="UserForm" component={UserForm} options={{title: "User Form"}}/>
         <Stack.Screen name="UserRole" component={UserRole} options={{title: "User Role"}}/>

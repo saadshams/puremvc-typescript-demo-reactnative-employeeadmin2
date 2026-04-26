@@ -38,9 +38,20 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
 
   useEffect(() => {
     ApplicationFacade.getInstance().register(delegate, ApplicationConstants.USER_ROLE);
+    return () => ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_ROLE);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const data = await delegate.findAllRoles();
+      setRoles(data);
+    })();
+  }, [delegate]);
+
+  useEffect(() => {
+    if (roles.length === 0) return;
 
     (async () => {
-      setRoles(await delegate.findAllRoles());
       if (route.params?.user.roles.length == 0) {
         setData(route.params.user.roles);
         setIsLoading(false);
@@ -51,11 +62,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
         setIsLoading(false);
       }
     })();
-
-    return () => {
-      ApplicationFacade.getInstance().unregister(null, ApplicationConstants.USER_ROLE)
-    };
-  }, []);
+  }, [roles]);
 
   const onChange = (role: Role) => {
     setData((state) => {

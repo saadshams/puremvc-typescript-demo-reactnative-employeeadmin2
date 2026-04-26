@@ -19,8 +19,8 @@ export class UserProxy extends Proxy {
     super(UserProxy.NAME, null);
   }
 
-  public async findAllUsers(): Promise<Partial<User>[]> {
-    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users`)
+  public async findAllUsers(signal : AbortSignal): Promise<Partial<User>[]> {
+    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users`, {signal})
     if (response.status === 200) {
       const data = await response.json();
       return data.map((user: User) => ({id: user.id, first: user.first, last: user.last}));
@@ -30,8 +30,8 @@ export class UserProxy extends Proxy {
     }
   }
 
-  public async findUserById(id: number): Promise<User> {
-    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users/${id}`);
+  public async findUserById(id: number, signal: AbortSignal): Promise<User> {
+    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users/${id}`, {signal});
     if (response.status === 200) {
       return await response.json();
     } else {
@@ -40,9 +40,10 @@ export class UserProxy extends Proxy {
     }
   }
 
-  public async deleteById(id: number): Promise<void> {
+  public async deleteById(id: number, signal: AbortSignal): Promise<void> {
     const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
+        signal: signal,
       }
     );
 
@@ -86,8 +87,8 @@ export class UserProxy extends Proxy {
     }
   }
 
-  public async findAllDepartments(): Promise<Department[]> {
-    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/departments`);
+  public async findAllDepartments(signal: AbortSignal): Promise<Department[]> {
+    const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/departments`, {signal});
     if (response.status === 200) {
       return await response.json();
     } else {

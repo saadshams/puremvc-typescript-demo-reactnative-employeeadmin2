@@ -22,20 +22,20 @@ export class UserFormMediator extends Mediator {
   }
 
   public async onRegister() {
-    this.delegate.findAllDepartments = () => this.findAllDepartments();
-    this.delegate.findUserById = id => this.findUserById(id);
-    this.delegate.save = user => this.save(user);
-    this.delegate.update = user => this.update(user);
+    this.delegate.findAllDepartments = (signal: AbortSignal) => this.findAllDepartments(signal);
+    this.delegate.findUserById = (id: number, signal: AbortSignal) => this.findUserById(id, signal);
+    this.delegate.save = (user: User) => this.save(user);
+    this.delegate.update = (user: User) => this.update(user);
 
     this.userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
   }
 
-  private async findAllDepartments() {
-    return await this.userProxy.findAllDepartments();
+  private async findAllDepartments(signal: AbortSignal) {
+    return await this.userProxy.findAllDepartments(signal);
   }
 
-  private async findUserById(id: number) {
-    return await this.userProxy.findUserById(id);
+  private async findUserById(id: number, signal: AbortSignal) {
+    return await this.userProxy.findUserById(id, signal);
   }
 
   private async save(user: User) {

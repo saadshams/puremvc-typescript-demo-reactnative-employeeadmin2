@@ -21,14 +21,14 @@ export class UserListMediator extends Mediator {
   }
 
   public async onRegister() {
-    this.delegate.findAllUsers = () => this.findAllUsers();
+    this.delegate.findAllUsers = (signal: AbortSignal) => this.findAllUsers(signal);
     this.delegate.deleteById = (id: number) => this.deleteById(id);
 
     this.userProxy = this.facade.retrieveProxy(UserProxy.NAME) as UserProxy;
   }
 
-  private async findAllUsers() {
-    return await this.userProxy.findAllUsers();
+  private async findAllUsers(signal: AbortSignal) {
+    return await this.userProxy.findAllUsers(signal);
   }
 
   private async deleteById(id: number): Promise<void> {
