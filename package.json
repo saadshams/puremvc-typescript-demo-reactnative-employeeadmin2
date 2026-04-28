@@ -13,6 +13,7 @@
     "@puremvc/puremvc-typescript-multicore-framework": "^2.2.0",
     "@react-native-masked-view/masked-view": "0.3.2",
     "@react-native-picker/picker": "^2.11.4",
+    "@react-navigation/native": "^7.2.2",
     "@react-navigation/native-stack": "^7.14.12",
     "@react-navigation/stack": "^7.8.9",
     "expo": "~54.0.33",
