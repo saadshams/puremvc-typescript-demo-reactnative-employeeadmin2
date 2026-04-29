@@ -9,14 +9,13 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {ActivityIndicator, Animated, FlatList, PanResponder, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {StackNavigationProp} from "@react-navigation/stack";
-import {RouteProp, useFocusEffect} from "@react-navigation/native";
+import {useFocusEffect} from "@react-navigation/native";
 import {ApplicationConstants, ParamList} from "../../ApplicationConstants";
 import {User} from "../../model/valueObject/User";
 import {ApplicationFacade} from "../../ApplicationFacade";
 
 interface Props {
   navigation: StackNavigationProp<ParamList, "UserList">;
-  route: RouteProp<ParamList, "UserList">;
 }
 
 export interface IUserList {
@@ -24,7 +23,7 @@ export interface IUserList {
   deleteById: (id: number) => Promise<void>,
 }
 
-const UserList: React.FC<Props> = ({navigation, route}) => {
+const UserList: React.FC<Props> = ({navigation}) => {
 
   // State
   const [users, setUsers] = useState<Partial<User>[]>([]); // User Data
