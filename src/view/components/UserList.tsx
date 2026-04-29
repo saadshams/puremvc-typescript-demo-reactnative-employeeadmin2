@@ -32,7 +32,7 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
   const [error, setError] = useState<Error>();
 
   const delegate = useRef<IUserList>({
-    findAllUsers: async (_signal: AbortSignal) => [],
+    findAllUsers: async (_signal: AbortSignal) => users,
     deleteById: async (_id: number) => {},
   }).current;
 

@@ -34,8 +34,8 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   const [error, setError] = useState<Error>();
 
   const delegate = useRef<IUserRole>({
-    findAllRoles: async (_signal: AbortSignal): Promise<Role[]> => [],
-    findRolesByUserId: async (_id: number, _signal): Promise<Role[]> => [],
+    findAllRoles: async (_signal: AbortSignal): Promise<Role[]> => roles,
+    findRolesByUserId: async (_id: number, _signal): Promise<Role[]> => data,
   }).current;
 
   // Effects
@@ -63,17 +63,16 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   useEffect(() => {
     if (roles.length === 0) return;
 
-    if (route.params?.user.roles.length == 0) {
+    if (route.params?.user.roles.length == 0)
       return setIsLoading(false);
-    }
 
     const controller = new AbortController();
 
     void (async () => {
       try {
-        if (route.params?.user.roles.length === 0 || route.params?.user.id === 0) {
+        if (route.params?.user.roles.length === 0 || route.params?.user.id === 0)
           return setData(route.params?.user.roles);
-        }
+
         let result = await delegate.findRolesByUserId(route.params?.user.id, controller.signal);
         if (!controller.signal.aborted) setData(result);
       } catch (error) {

@@ -42,7 +42,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   const isIOS = Platform.OS === "ios";
 
   const delegate = useRef<IUserForm>({
-    findAllDepartments: async (_signal: AbortSignal): Promise<Department[]> => [],
+    findAllDepartments: async (_signal: AbortSignal): Promise<Department[]> => departments,
     findUserById: async (_id: number, _signal: AbortSignal): Promise<User> => user,
     save: async (_user: User): Promise<void> => {},
     update: async (_user: User): Promise<void> => {},
