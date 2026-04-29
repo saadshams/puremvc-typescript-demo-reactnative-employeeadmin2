@@ -71,7 +71,8 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   }, []);
 
   useEffect(() => {
-    if (departments.length === 0) return () => {};
+    if (departments.length === 0) return;
+
     const controller = new AbortController();
 
     void (async () => {
@@ -99,7 +100,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
     ));
   }
 
-  const onValueChange = (value: number, index: number) => { // department handler
+  const onValueChange = (value: number, index: number) => {
     setUser((state: User) => (
       {
         ...state,
@@ -109,11 +110,11 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
     setTimeout(() => setIsPickerVisible(false), 150);
   }
 
-  const onRoles = (event: any) => { // Roles handler
+  const onRoles = (event: any) => {
     navigation.navigate("UserRole", {user: user});
   }
 
-  const onSave = async (event: any) => { // save handler
+  const onSave = async (event: any) => {
     try {
       user.id === 0 ? await delegate.save(user) : await delegate.update(user);
       if (navigation.canGoBack()) navigation.goBack();
@@ -148,12 +149,12 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   }
 
   function password() {
-    return (<TextInput style={styles.input} placeholder="Password" value={user?.password}
+    return (<TextInput style={styles.input} placeholder="Password" value={user?.password} secureTextEntry={true}
                        onChangeText={(value) => setUser(({...user, password: value} as User))}/>);
   }
 
   function confirm() {
-    return (<TextInput style={styles.input} placeholder="Confirm" value={user?.confirm}
+    return (<TextInput style={styles.input} placeholder="Confirm" value={user?.confirm} secureTextEntry={true}
                        onChangeText={(value) => setUser(({...user, confirm: value} as User))}/>);
   }
 
