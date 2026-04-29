@@ -9,7 +9,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {ActivityIndicator, Button, ScrollView, StyleSheet, Text, View} from "react-native";
 import {RouteProp} from "@react-navigation/native";
-import Checkbox from 'expo-checkbox';
+import Checkbox from "expo-checkbox";
 import {StackNavigationProp} from "@react-navigation/stack";
 import {ApplicationConstants, ParamList} from "../../ApplicationConstants";
 import {Role} from "../../model/valueObject/Role";
