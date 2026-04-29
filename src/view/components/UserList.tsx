@@ -29,8 +29,8 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
   // State
   const [users, setUsers] = useState<Partial<User>[]>([]); // User Data
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error>();
-
+  const [error, setError] = useState<Error | null>(null);
+  
   const delegate = useRef<IUserList>({
     findAllUsers: async (_signal: AbortSignal) => users,
     deleteById: async (_id: number) => {},
@@ -109,7 +109,11 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
         <View style={styles.spinnerContainer}>
           <ActivityIndicator size="large" />
         </View>
-      ) : users.length == 0 ? (
+      ) : error ? (
+        <View style={styles.container}>
+          <Text style={styles.errorText}>{error.message}</Text>
+        </View>
+      ) : users.length === 0 ? (
         <Text>No Users Found</Text>
       ) : (
         <View style={styles.container}>
@@ -163,10 +167,14 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-
   rowContent: {
     backgroundColor: "white",
   },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
+  }
 });
 
 export default UserList;

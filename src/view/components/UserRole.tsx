@@ -31,7 +31,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
   const [roles, setRoles] = useState<Role[]>([]); // UI Data
   const [data, setData] = useState<Role[]>([]); // User Data
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<Error | null>(null);
 
   const delegate = useRef<IUserRole>({
     findAllRoles: async (_signal: AbortSignal): Promise<Role[]> => roles,
@@ -134,6 +134,10 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
         <View style={styles.spinnerContainer}>
           <ActivityIndicator size="large" />
         </View>
+      ) : error ? (
+        <View style={styles.container}>
+          <Text style={styles.errorText}>{error.message}</Text>
+        </View>
       ) : (
         <View style={styles.container}>
           <ScrollView style={styles.scrollView}>
@@ -188,6 +192,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: "#ddd",
   },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
+  }
 });
 
 export default UserRole;

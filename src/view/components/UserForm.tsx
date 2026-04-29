@@ -35,7 +35,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
   const [departments, setDepartments] = useState<Department[]>([]); // UI Data
   const [user, setUser] = useState<User>(createDefaultUser()); // User Data
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<Error | null>(null);
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const isAndroid = Platform.OS === "android";
@@ -213,6 +213,10 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
         <View style={styles.spinnerContainer}>
           <ActivityIndicator size="large" />
         </View>
+      ) : error ? (
+        <View style={styles.container}>
+          <Text style={styles.errorText}>{error.message}</Text>
+        </View>
       ) : (
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.row}>
@@ -346,6 +350,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
   },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
+  }
 });
 
 export default UserForm;
