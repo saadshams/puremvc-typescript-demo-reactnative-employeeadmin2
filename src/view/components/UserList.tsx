@@ -48,7 +48,8 @@ const UserList: React.FC<Props> = ({navigation, route}) => {
 
       void (async () => {
         try {
-          setUsers(await delegate.findAllUsers(controller.signal));
+          const result = await delegate.findAllUsers(controller.signal);
+          if (!controller.signal.aborted) setUsers(result);
         } catch (error) {
           if (!controller.signal.aborted)
             setError(error instanceof Error ? error : new Error(String(error)));

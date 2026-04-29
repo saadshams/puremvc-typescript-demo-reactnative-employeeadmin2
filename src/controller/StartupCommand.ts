@@ -6,11 +6,11 @@
 //  Your reuse is governed by the BSD 3-Clause License
 //
 
-import { SimpleCommand, INotification } from "@puremvc/puremvc-typescript-multicore-framework";
-import { UserProxy } from "../model/UserProxy";
-import { RoleProxy } from "../model/RoleProxy";
-import { RegisterCommand } from "./RegisterCommand";
-import { ApplicationConstants } from "../ApplicationConstants";
+import {INotification, SimpleCommand} from "@puremvc/puremvc-typescript-multicore-framework";
+import {UserProxy} from "../model/UserProxy";
+import {RoleProxy} from "../model/RoleProxy";
+import {RegisterCommand} from "./RegisterCommand";
+import {ApplicationConstants} from "../ApplicationConstants";
 
 export class StartupCommand extends SimpleCommand {
 
