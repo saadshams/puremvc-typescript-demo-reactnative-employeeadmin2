@@ -40,10 +40,9 @@ export class UserProxy extends Proxy {
     }
   }
 
-  public async deleteById(id: number, signal: AbortSignal): Promise<void> {
+  public async deleteById(id: number): Promise<void> {
     const response = await fetch(`${Platform.OS === "android" ? "http://10.0.2.2" : "http://127.0.0.1"}/users/${id}`, {
-        method: "DELETE",
-        signal: signal,
+        method: "DELETE"
       }
     );
 
