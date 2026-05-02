@@ -62,8 +62,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
         const result = await delegate.findAllDepartments(controller.signal);
         if (!controller.signal.aborted) setDepartments(result);
       } catch (error) {
-        if (!controller.signal.aborted)
-          setError(error instanceof Error ? error : new Error(String(error)));
+        if (!controller.signal.aborted) setError(error instanceof Error ? error : new Error(String(error)));
       }
     })();
 
@@ -83,8 +82,7 @@ const UserForm: React.FC<Props> = ({navigation, route}) => {
         const result = await delegate.findUserById(id, controller.signal);
         if (!controller.signal.aborted) setUser({ ...result, confirm: result.password });
       } catch (error) {
-        if (!controller.signal.aborted)
-          setError(error instanceof Error ? error : new Error(String(error)));
+        if (!controller.signal.aborted) setError(error instanceof Error ? error : new Error(String(error)));
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
       }

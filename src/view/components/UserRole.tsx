@@ -52,8 +52,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
         let result = await delegate.findAllRoles(controller.signal);
         if (!controller.signal.aborted) setRoles(result);
       } catch (error) {
-        if (!controller.signal.aborted)
-          setError(error instanceof Error ? error : new Error(String(error)));
+        if (!controller.signal.aborted) setError(error instanceof Error ? error : new Error(String(error)));
       }
     })();
 
@@ -76,8 +75,7 @@ const UserRole: React.FC<Props> = ({navigation, route}) => {
         let result = await delegate.findRolesByUserId(route.params?.user.id, controller.signal);
         if (!controller.signal.aborted) setData(result);
       } catch (error) {
-        if (!controller.signal.aborted)
-          setError(error instanceof Error ? error : new Error(String(error)));
+        if (!controller.signal.aborted) setError(error instanceof Error ? error : new Error(String(error)));
       } finally {
         if (!controller.signal.aborted) setIsLoading(false);
       }

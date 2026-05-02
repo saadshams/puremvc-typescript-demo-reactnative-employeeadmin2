@@ -50,8 +50,7 @@ const UserList: React.FC<Props> = ({navigation}) => {
           const result = await delegate.findAllUsers(controller.signal);
           if (!controller.signal.aborted) setUsers(result);
         } catch (error) {
-          if (!controller.signal.aborted)
-            setError(error instanceof Error ? error : new Error(String(error)));
+          if (!controller.signal.aborted) setError(error instanceof Error ? error : new Error(String(error)));
         } finally {
           if (!controller.signal.aborted) setIsLoading(false);
         }
