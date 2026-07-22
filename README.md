@@ -1,10 +1,6 @@
 ## [PureMVC](https://puremvc.org) [TypeScript](https://github.com/PureMVC/puremvc-typescript-multicore-framework/wiki) [ReactNative](https://en.wikipedia.org/wiki/React_Native) Demo - Employee Admin
 This demo illustrates techniques for performing routine client-side maintenance operations in a PureMVC-based application.
 
-## Branches
-* [main](https://github.com/PureMVC/puremvc-typescript-demo-reactnative-employeeadmin) - vanilla version
-* [service](https://github.com/PureMVC/puremvc-typescript-demo-reactnative-employeeadmin/tree/service) - integrated with [PureMVC JS Microservice](https://github.com/PureMVC/puremvc-js-demo-microservice-employeeadmin)
-
 ---
 
 ## Screenshot
